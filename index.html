@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VOULGE — Orion Drift Creator</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>
+tailwind.config = { theme: { extend: { fontFamily: { sans: ['Manrope', 'Helvetica Neue', 'Segoe UI', 'sans-serif'] }, colors: { gold: '#d4af37' } } } };
+</script>
+<style>
+:root { color-scheme: dark; box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); --gold: #d4af37; }
+html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+body { margin: 0; background: #000; color: #fff; font-family: 'Manrope', 'Helvetica Neue', sans-serif; overflow-x: hidden; }
+.eyebrow { font-size: 11px; letter-spacing: .4em; text-transform: uppercase; color: var(--gold); }
+.gold-text { background: linear-gradient(120deg, #f6e3a1, #d4af37 45%, #8a6d1c); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.orb { background: radial-gradient(circle at 34% 28%, #fff1bd 0%, #e6c35a 14%, #d4af37 30%, #6b5217 55%, #120d02 78%, #000 100%); box-shadow: 0 0 120px rgba(212,175,55,.35), inset -40px -50px 90px rgba(0,0,0,.85); -webkit-mask-image: radial-gradient(circle, #000 62%, transparent 71%); mask-image: radial-gradient(circle, #000 62%, transparent 71%); }
+.orb::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: repeating-linear-gradient(172deg, transparent 0 14px, rgba(0,0,0,.18) 14px 22px); mix-blend-mode: multiply; }
+.float { animation: float 8s ease-in-out infinite; }
+@keyframes float { 50% { transform: translateY(-14px); } }
+.spin { animation: spin 50s linear infinite; } .spin-r { animation: spin 80s linear infinite reverse; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.twinkle { animation: tw 4s ease-in-out infinite; } @keyframes tw { 50% { opacity: .15; } }
+.bounce-y { animation: by 2s ease-in-out infinite; } @keyframes by { 50% { transform: translateY(6px); } }
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 1s cubic-bezier(.2,.7,.2,1), transform 1s cubic-bezier(.2,.7,.2,1); }
+.reveal.in { opacity: 1; transform: none; }
+.panel { background: linear-gradient(160deg, #0d0d0d, #060606); border: 1px solid rgba(255,255,255,.07); transition: border-color .5s, box-shadow .5s, transform .5s; }
+.panel:hover { border-color: rgba(212,175,55,.45); box-shadow: 0 0 60px rgba(212,175,55,.1); transform: translateY(-4px); }
+.gcard { transform-style: preserve-3d; transition: transform .25s ease-out, box-shadow .4s, border-color .4s; border: 1px solid rgba(255,255,255,.08); }
+.gcard:hover { border-color: rgba(212,175,55,.8); box-shadow: 0 30px 70px rgba(0,0,0,.8), 0 0 50px rgba(212,175,55,.3); }
+.hscroll::-webkit-scrollbar { display: none; } .hscroll { scrollbar-width: none; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } .reveal { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide-react@0.383.0/dist/umd/lucide-react.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+const LR = window.lucideReact || window.LucideReact || {};
+const I = (n) => LR[n] || (() => null);
+const [Youtube, Twitch, Twitter, MessageSquare, ChevronDown, ArrowUpRight, Target, Crosshair, Timer, Users, Trophy, Clock, Play, Menu, X, Glasses, Gauge, Rocket, Radio] =
+  ['Youtube','Twitch','Twitter','MessageSquare','ChevronDown','ArrowUpRight','Target','Crosshair','Timer','Users','Trophy','Clock','Play','Menu','X','Glasses','Gauge','Rocket','Radio'].map(I);
+
+function useReveal() {
+  useEffect(() => {
+    const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('in')), { threshold: .12 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    return () => io.disconnect();
+  });
+}
+
+function Nav() {
+  const [open, setOpen] = useState(false);
+  const links = ['About', 'Services', 'Stats', 'Gallery'];
+  return (
+    <header className="fixed inset-x-0 top-0 z-50 backdrop-blur-xl bg-black/60 border-b border-white/5" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+      <div className="max-w-7xl mx-auto px-6 h-20 grid grid-cols-[1fr_auto_1fr] items-center">
+        <a href="#top" className="flex items-center gap-3 tracking-[.35em] text-sm font-semibold">
+          <span className="w-2 h-2 rounded-full bg-gold shadow-[0_0_14px_#d4af37]" /> VOULGE
+        </a>
+        <nav className="hidden md:flex gap-10 text-[12px] tracking-[.25em] uppercase text-neutral-400">
+          {links.map(l => <a key={l} href={'#' + l.toLowerCase()} className="hover:text-gold transition-colors">{l}</a>)}
+        </nav>
+        <div className="flex justify-end items-center gap-4 col-start-3">
+          <a href="#gallery" className="hidden sm:inline-block px-6 py-2.5 rounded-full border border-gold/50 text-gold text-[11px] tracking-[.25em] uppercase transition-all hover:bg-gold hover:text-black hover:shadow-[0_0_30px_rgba(212,175,55,.5)]">Watch Videos</a>
+          <button className="md:hidden text-white" onClick={() => setOpen(!open)} aria-label="Menu">{open ? <X /> : <Menu />}</button>
+        </div>
+      </div>
+      {open && <div className="md:hidden px-6 pb-6 flex flex-col gap-4 text-xs tracking-[.25em] uppercase text-neutral-300">
+        {links.map(l => <a key={l} href={'#' + l.toLowerCase()} onClick={() => setOpen(false)}>{l}</a>)}
+        <a href="#gallery" className="text-gold">Watch Videos</a>
+      </div>}
+    </header>
+  );
+}
+
+function Hero() {
+  const stars = Array.from({ length: 40 }, (_, i) => ({ l: (i * 53) % 100, t: (i * 37) % 100, s: 1 + (i % 3), d: (i % 7) * .6 }));
+  return (
+    <section id="top" className="relative min-h-screen flex flex-col items-center justify-center pt-28 pb-16 overflow-hidden text-center">
+      {stars.map((s, i) => <span key={i} className="absolute rounded-full bg-white twinkle" style={{ left: s.l + '%', top: s.t + '%', width: s.s, height: s.s, opacity: .5, animationDelay: s.d + 's' }} />)}
+      <p className="eyebrow px-6 reveal in">Mastering Movement Through Veteran Innovation</p>
+      <div className="relative mt-6 w-[min(86vw,560px)] aspect-square float flex items-center justify-center">
+        <div className="absolute inset-[-20%] rounded-full bg-gold/15 blur-[110px]" />
+        <div className="orb absolute inset-0 rounded-full" />
+        <svg className="absolute inset-[-6%] w-[112%] h-[112%]" viewBox="0 0 100 100" fill="none">
+          <g className="spin" style={{ transformOrigin: '50px 50px' }}>
+            <circle cx="50" cy="50" r="48" stroke="#d4af37" strokeOpacity=".35" strokeWidth=".15" strokeDasharray="1 2.5" />
+            <circle cx="50" cy="2" r=".9" fill="#f6e3a1" />
+          </g>
+          <g className="spin-r" style={{ transformOrigin: '50px 50px' }}>
+            <ellipse cx="50" cy="50" rx="49" ry="14" stroke="#d4af37" strokeOpacity=".5" strokeWidth=".2" transform="rotate(-18 50 50)" />
+          </g>
+        </svg>
+        <h1 className="relative font-extralight text-5xl sm:text-7xl md:text-8xl tracking-[.3em] pl-[.3em] drop-shadow-[0_0_30px_rgba(0,0,0,.9)]">VOULGE</h1>
+      </div>
+      <p className="mt-4 text-neutral-400 font-light tracking-[.15em] px-6">Competitive Orion Drift. Movement, perfected.</p>
+      <a href="#about" className="mt-10 inline-flex flex-col items-center gap-2 text-[11px] tracking-[.35em] uppercase text-neutral-300 hover:text-gold transition-colors">
+        Discover More <ChevronDown size={18} className="bounce-y text-gold" />
+      </a>
+    </section>
+  );
+}
+
+function Platforms() {
+  const items = [[Youtube, 'YouTube'], [MessageSquare, 'Discord']];
+  return (
+    <section className="border-y border-white/5 bg-[#050505]">
+      <div className="max-w-3xl mx-auto grid grid-cols-2">
+        {items.map(([Icon, n], i) => (
+          <div key={n} className={`group py-10 flex items-center justify-center gap-3 text-neutral-600 hover:text-gold transition-colors ${i ? 'border-l border-white/5' : ''}`}>
+            <Icon size={22} className="transition-transform group-hover:scale-110" />
+            <span className="text-xs tracking-[.35em] uppercase">{n}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function About() {
+  return (
+    <section id="about" className="max-w-6xl mx-auto px-6 py-32 grid md:grid-cols-2 gap-16 items-center">
+      <div className="reveal relative">
+        <div className="absolute -inset-6 bg-gold/10 blur-3xl rounded-full" />
+        <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-white/10 grayscale contrast-125" style={{ background: 'radial-gradient(circle at 30% 20%, #6b6b6b, #1a1a1a 55%, #000)' }}>
+          <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent 0 3px, rgba(0,0,0,.6) 3px 4px)' }} />
+          <Glasses size={150} strokeWidth={.6} className="absolute inset-0 m-auto text-white/60" />
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black to-transparent" />
+          <span className="absolute bottom-5 left-5 text-[10px] tracking-[.35em] text-white/60 uppercase">Photo placeholder</span>
+        </div>
+      </div>
+      <div className="reveal">
+        <p className="eyebrow mb-5">About Voulge</p>
+        <h2 className="text-4xl md:text-5xl font-light leading-tight tracking-wide">I Always Chase <span className="gold-text font-normal">The Best</span></h2>
+        <p className="mt-8 text-neutral-400 leading-[1.9] font-light">Voulge is a competitive Orion Drift player, movement specialist, and community guide creator. Hands-on time in the arena has gone into understanding the game’s physics: how momentum carries through a jetpack burn, how a clean wall-drift saves tenths of a second, and where the best players quietly gain their edge.</p>
+        <p className="mt-5 text-neutral-400 leading-[1.9] font-light">Every guide and breakdown is built to make advanced movement approachable, whether you’re chasing your first sub-30 run or tuning a tournament-ready line.</p>
+        <a href="#services" className="mt-10 inline-flex items-center gap-2 text-xs tracking-[.3em] uppercase text-gold group">Explore the craft <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" /></a>
+      </div>
+    </section>
+  );
+}
+
+function Services() {
+  const s = [
+    [Rocket, 'Advanced Mechanics', 'Jetpack control, wall-drifts and momentum chaining, broken down frame by frame so every technique becomes repeatable.'],
+    [Target, 'Competitive Match Strategy', 'Positioning, rotations and decision-making for ranked and tournament play, built from real match experience.'],
+    [Timer, 'Speedrun Coaching', 'Route planning and time-trial refinement to shave seconds and push toward sub-30 runs.'],
+    [Users, 'Community Guides', 'Clear, beginner-friendly walkthroughs and Discord sessions that bring new pilots up to speed.'],
+  ];
+  return (
+    <section id="services" className="bg-[#050505] border-y border-white/5 py-32">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center mb-16 reveal"><p className="eyebrow mb-4">What I Do</p><h2 className="text-4xl md:text-5xl font-light tracking-wide">Built for <span className="gold-text">precision</span></h2></div>
+        <div className="grid md:grid-cols-2 gap-6">
+          {s.map(([Icon, t, d]) => (
+            <div key={t} className="panel reveal rounded-2xl p-8 flex gap-6">
+              <div className="shrink-0 w-14 h-14 rounded-full border border-gold/40 flex items-center justify-center text-gold bg-gold/5 shadow-[0_0_30px_rgba(212,175,55,.15)]"><Icon size={22} strokeWidth={1.5} /></div>
+              <div><h3 className="text-lg font-semibold tracking-wide">{t}</h3><p className="mt-3 text-neutral-400 font-light leading-relaxed">{d}</p></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Counter({ to, suffix, label }) {
+  const [v, setV] = useState(0); const ref = useRef(null);
+  useEffect(() => {
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return; io.disconnect();
+      const t0 = performance.now();
+      const step = (t) => { const p = Math.min(1, (t - t0) / 1800); setV(Math.round(to * (1 - Math.pow(1 - p, 3)))); if (p < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    }, { threshold: .4 });
+    io.observe(ref.current); return () => io.disconnect();
+  }, [to]);
+  return (
+    <div ref={ref} className="text-center py-10 px-4">
+      <div className="text-6xl md:text-7xl font-extralight gold-text">{v.toLocaleString()}{suffix}</div>
+      <div className="mt-4 text-[11px] tracking-[.35em] uppercase text-neutral-500">{label}</div>
+    </div>
+  );
+}
+
+const CHANNEL_ID = 'UClC8ramdKXZXUwQqTjuDRzw';
+const API_KEY = 'AIzaSyATKHSG80iqoxX_INll-feDafGtSxbRGIk'; // restrict this key to your site's domain in Google Cloud Console
+
+function useYouTubeStats() {
+  const [stats, setStats] = useState({ subs: 0, views: 0, videos: 0 });
+  useEffect(() => {
+    fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${CHANNEL_ID}&key=${API_KEY}`)
+      .then(r => r.json())
+      .then(d => {
+        const s = d.items && d.items[0] && d.items[0].statistics;
+        if (s) setStats({ subs: +s.subscriberCount || 0, views: +s.viewCount || 0, videos: +s.videoCount || 0 });
+      })
+      .catch(() => {}); // keep zeros if the request fails
+  }, []);
+  return stats;
+}
+
+function Stats() {
+  const STATS = useYouTubeStats();
+  return (
+    <section id="stats" className="relative max-w-6xl mx-auto px-6 py-28 reveal">
+      <div className="absolute inset-x-0 top-1/2 h-40 -translate-y-1/2 bg-gold/10 blur-[100px]" />
+      <div className="relative grid md:grid-cols-3 md:divide-x divide-white/10 border-y border-white/10">
+        <Counter to={STATS.subs} suffix="" label="Subscribers" />
+        <Counter to={STATS.views} suffix="" label="Total Views" />
+        <Counter to={STATS.videos} suffix="" label="Videos Posted" />
+      </div>
+      <p className="relative mt-8 text-center text-[11px] tracking-[.35em] uppercase text-neutral-500">Day one — follow along from the start</p>
+    </section>
+  );
+}
+
+const CASES = [
+  ['Sub-30 Second Time Trial', 'Time Trial', Gauge],
+  ['Advanced Jetpack Mechanics Guide', 'Guide', Rocket],
+  ['Competitive Match Highlights', 'Highlights', Trophy],
+  ['Wall-Drift Fundamentals', 'Tutorial', Crosshair],
+  ['Arena Flow: Route Breakdown', 'Analysis', Target],
+];
+
+function Tilt({ children, c }) {
+  const ref = useRef(null);
+  const move = (e) => {
+    const r = ref.current.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+    ref.current.style.transform = `perspective(900px) rotateY(${x * 14}deg) rotateX(${-y * 14}deg) translateY(-12px) scale(1.03)`;
+  };
+  const leave = () => { ref.current.style.transform = ''; };
+  return <article ref={ref} onMouseMove={move} onMouseLeave={leave} className="gcard rounded-2xl overflow-hidden bg-[#0a0a0a] w-[300px] sm:w-[400px] shrink-0">{children}</article>;
+}
+
+function Gallery() {
+  const wrap = useRef(null), track = useRef(null), target = useRef(0), cur = useRef(0), fine = useRef(true);
+  useEffect(() => {
+    fine.current = window.matchMedia('(pointer: fine)').matches;
+    if (!fine.current) return;
+    let raf;
+    const tick = () => {
+      const max = Math.max(0, track.current.scrollWidth - wrap.current.clientWidth);
+      cur.current += (target.current * max - cur.current) * 0.07;
+      track.current.style.transform = `translateX(${-cur.current}px)`;
+      raf = requestAnimationFrame(tick);
+    };
+    tick(); return () => cancelAnimationFrame(raf);
+  }, []);
+  const onMove = (e) => {
+    if (!fine.current) return;
+    const r = wrap.current.getBoundingClientRect();
+    target.current = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+  };
+  return (
+    <section id="gallery" className="py-32 overflow-hidden">
+      <div className="max-w-6xl mx-auto px-6 mb-14 reveal"><p className="eyebrow mb-4">Case Studies</p><h2 className="text-4xl md:text-5xl font-light tracking-wide">Featured <span className="gold-text">transmissions</span></h2></div>
+      <div ref={wrap} onMouseMove={onMove} className="hscroll overflow-x-auto [@media(pointer:fine)]:overflow-hidden py-10 px-6 md:px-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))]">
+        <div ref={track} className="flex flex-nowrap gap-8 w-max will-change-transform">
+          {CASES.map(([t, k, Icon], i) => (
+            <Tilt key={t}>
+              <div className="relative aspect-video flex items-center justify-center overflow-hidden" style={{ background: `radial-gradient(circle at ${30 + i * 12}% 30%, rgba(212,175,55,.35), #0a0a0a 65%)` }}>
+                <Icon size={120} strokeWidth={.5} className="absolute -right-4 -bottom-4 text-gold/20" />
+                <div className="w-14 h-14 rounded-full border border-gold/70 text-gold flex items-center justify-center backdrop-blur bg-black/40"><Play size={20} fill="currentColor" /></div>
+                <span className="absolute top-4 left-4 text-[9px] tracking-[.3em] uppercase px-3 py-1 rounded-full bg-black/60 border border-gold/40 text-gold">Coming soon</span>
+              </div>
+              <div className="p-6"><div className="eyebrow !text-[10px] mb-2">{k}</div><h3 className="text-lg font-medium tracking-wide">{t}</h3><p className="mt-2 text-sm text-neutral-500 font-light">Placeholder — first upload lands here.</p></div>
+            </Tilt>
+          ))}
+        </div>
+      </div>
+      <p className="max-w-6xl mx-auto px-6 text-[11px] tracking-[.35em] uppercase text-neutral-600 hidden [@media(pointer:fine)]:block">← Move your mouse to glide through →</p>
+    </section>
+  );
+}
+
+function Footer() {
+  const col = (h, items) => (<div><h4 className="text-[11px] tracking-[.35em] uppercase text-white mb-5">{h}</h4><ul className="space-y-3 text-sm text-neutral-500 font-light">{items.map(i => <li key={i[0]}><a href={i[1]} className="hover:text-gold transition-colors">{i[0]}</a></li>)}</ul></div>);
+  return (
+    <footer id="contact" className="relative border-t border-white/5 bg-[#030303] overflow-hidden">
+      <div className="absolute -bottom-40 left-1/2 -translate-x-1/2 w-[60rem] h-72 bg-gold/10 blur-[120px] rounded-full" />
+      <div className="relative max-w-6xl mx-auto px-6 pt-20 pb-10">
+        <div className="grid md:grid-cols-4 gap-12">
+          <div className="md:col-span-2">
+            <div className="flex items-center gap-3 tracking-[.35em] text-sm font-semibold"><span className="w-2 h-2 rounded-full bg-gold shadow-[0_0_14px_#d4af37]" /> VOULGE</div>
+            <p className="mt-5 max-w-sm text-neutral-500 font-light leading-relaxed">Competitive Orion Drift creator. Mastering movement, one drift at a time.</p>
+            <div className="mt-7 flex gap-3">
+              {[Youtube, MessageSquare].map((Icon, i) => <a key={i} href="#contact" onClick={e => e.preventDefault()} className="w-11 h-11 rounded-full border border-white/10 flex items-center justify-center text-neutral-400 transition-all hover:text-gold hover:border-gold/60 hover:shadow-[0_0_24px_rgba(212,175,55,.35)]"><Icon size={18} /></a>)}
+            </div>
+          </div>
+          {col('Explore', [['About', '#about'], ['Services', '#services'], ['Stats', '#stats'], ['Gallery', '#gallery']])}
+          {col('Platforms', [['YouTube', '#contact'], ['Discord', '#contact']])}
+        </div>
+        <div className="mt-16 pt-6 border-t border-white/5 flex flex-wrap justify-between gap-3 text-[11px] tracking-[.25em] uppercase text-neutral-600">
+          <span>© 2026 Voulge. All rights reserved.</span><span>Fly fast · Drift clean</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function App() {
+  useReveal();
+  return <div><Nav /><Hero /><Platforms /><About /><Services /><Stats /><Gallery /><Footer /></div>;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
