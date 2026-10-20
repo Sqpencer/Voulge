@@ -63,18 +63,20 @@ const YT = 'https://www.youtube.com/channel/UClC8ramdKXZXUwQqTjuDRzw';
 const DISCORD = '#connect'; // paste your Discord invite link here
 
 /*STATS_START*/
-const YT_KEY = 'AIzaSyATKHSG80iqoxX_INll-feDafGtSxbRGIk'; // paste your YouTube Data API v3 key (restrict it to voulge.vercel.app/* in Google Cloud)
-const YT_ID = 'https://www.youtube.com/channel/UClC8ramdKXZXUwQqTjuDRzw';
+const YT_KEY = 'YOUR_API_KEY';
+const YT_ID = 'UClC8ramdKXZXUwQqTjuDRzw';
 function useStats() {
   const [s, setS] = useState({ subs: 0, views: 0, videos: 0 });
   useEffect(() => {
     fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${YT_ID}&key=${YT_KEY}`)
       .then(r => r.json())
       .then(d => {
+        console.log('YouTube API response:', d);
+        if (d.error) { console.error('YouTube API error:', d.error.message); return; }
         const x = d.items && d.items[0] && d.items[0].statistics;
         if (x) setS({ subs: +x.subscriberCount || 0, views: +x.viewCount || 0, videos: +x.videoCount || 0 });
       })
-      .catch(() => {});
+      .catch(e => console.error('Fetch failed:', e));
   }, []);
   return s;
 }
