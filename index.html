@@ -4,33 +4,45 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>VOULGE — Orion Drift Creator</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <script>
-tailwind.config = { theme: { extend: { fontFamily: { sans: ['Manrope', 'Helvetica Neue', 'Segoe UI', 'sans-serif'] }, colors: { gold: '#d4af37' } } } };
+tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'Segoe UI', 'Helvetica Neue', 'sans-serif'] }, colors: { ac: '#ff5a2a' } } } };
 </script>
 <style>
-:root { color-scheme: dark; box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); --gold: #d4af37; }
-html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
-body { margin: 0; background: #000; color: #fff; font-family: 'Manrope', 'Helvetica Neue', sans-serif; overflow-x: hidden; }
-.eyebrow { font-size: 11px; letter-spacing: .4em; text-transform: uppercase; color: var(--gold); }
-.gold-text { background: linear-gradient(120deg, #f6e3a1, #d4af37 45%, #8a6d1c); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.orb { background: radial-gradient(circle at 34% 28%, #fff1bd 0%, #e6c35a 14%, #d4af37 30%, #6b5217 55%, #120d02 78%, #000 100%); box-shadow: 0 0 120px rgba(212,175,55,.35), inset -40px -50px 90px rgba(0,0,0,.85); -webkit-mask-image: radial-gradient(circle, #000 62%, transparent 71%); mask-image: radial-gradient(circle, #000 62%, transparent 71%); }
-.orb::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: repeating-linear-gradient(172deg, transparent 0 14px, rgba(0,0,0,.18) 14px 22px); mix-blend-mode: multiply; }
-.float { animation: float 8s ease-in-out infinite; }
-@keyframes float { 50% { transform: translateY(-14px); } }
-.spin { animation: spin 50s linear infinite; } .spin-r { animation: spin 80s linear infinite reverse; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.twinkle { animation: tw 4s ease-in-out infinite; } @keyframes tw { 50% { opacity: .15; } }
-.bounce-y { animation: by 2s ease-in-out infinite; } @keyframes by { 50% { transform: translateY(6px); } }
-.reveal { opacity: 0; transform: translateY(30px); transition: opacity 1s cubic-bezier(.2,.7,.2,1), transform 1s cubic-bezier(.2,.7,.2,1); }
+:root { color-scheme: dark; box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; }
+body { margin: 0; background: #050304; color: #e8edf7; font-family: 'Inter', 'Segoe UI', sans-serif; overflow-x: hidden; }
+.bg-hero { background: radial-gradient(ellipse 80% 60% at 50% 0%, #3a130c 0%, #1a0b07 45%, #050304 100%); }
+.glass { background: rgba(26,15,12,.72); border: 1px solid rgba(255,255,255,.08); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-radius: 18px; }
+.lift { transition: transform .4s cubic-bezier(.2,.7,.2,1), border-color .4s, box-shadow .4s; }
+.lift:hover { transform: translateY(-6px); border-color: rgba(255,90,40,.6); box-shadow: 0 0 0 1px rgba(255,90,40,.35), 0 24px 60px -12px rgba(255,90,40,.4); }
+.wm { filter: drop-shadow(0 0 28px rgba(255,90,40,.5)); animation: breathe 4s ease-in-out infinite; }
+@keyframes breathe { 50% { filter: drop-shadow(0 0 46px rgba(255,90,40,.8)); } }
+.wm path, .wm polyline, .wm polygon { stroke-dasharray: 700; stroke-dashoffset: 700; animation: draw 1.6s .2s cubic-bezier(.3,.7,.2,1) forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.pn { transform: translate3d(calc(var(--mx, 0) * var(--k, 10) * 1px), calc(var(--my, 0) * var(--k, 10) * .7px), 0); transition: transform .25s ease-out; }
+.fl { animation: fl 7s ease-in-out infinite; } @keyframes fl { 50% { transform: translateY(-10px); } }
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
 .reveal.in { opacity: 1; transform: none; }
-.panel { background: linear-gradient(160deg, #0d0d0d, #060606); border: 1px solid rgba(255,255,255,.07); transition: border-color .5s, box-shadow .5s, transform .5s; }
-.panel:hover { border-color: rgba(212,175,55,.45); box-shadow: 0 0 60px rgba(212,175,55,.1); transform: translateY(-4px); }
-.gcard { transform-style: preserve-3d; transition: transform .25s ease-out, box-shadow .4s, border-color .4s; border: 1px solid rgba(255,255,255,.08); }
-.gcard:hover { border-color: rgba(212,175,55,.8); box-shadow: 0 30px 70px rgba(0,0,0,.8), 0 0 50px rgba(212,175,55,.3); }
+header { transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+html[data-nav="hide"] header { transform: translateY(-140%); }
+html.has-cursor, html.has-cursor * { cursor: none !important; }
+.word { transform: translateY(110%); transition: transform .95s cubic-bezier(.2,.7,.2,1) calc(var(--i, 0) * 80ms + 120ms); }
+.reveal.in .word { transform: none; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+@keyframes fu { from { opacity: 0; translate: 0 34px; } to { opacity: 1; translate: 0 0; } }
+.fu { opacity: 0; animation: fu 1s cubic-bezier(.2,.7,.2,1) forwards; animation-delay: var(--d, 0s); }
+@keyframes mq { to { transform: translateX(-50%); } }
+.mq-o { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.3); }
+.lift { position: relative; }
+.lift::before { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .3s; background: radial-gradient(280px circle at var(--lx, 50%) var(--ly, 50%), rgba(255,120,50,.18), transparent 60%); }
+.lift:hover::before { opacity: 1; }
 .hscroll::-webkit-scrollbar { display: none; } .hscroll { scrollbar-width: none; }
-@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } .reveal { opacity: 1; transform: none; } }
+.btn-p { background: linear-gradient(135deg,#ff3b30,#ff8a1f); transition: all .3s; } .btn-p:hover { filter: brightness(1.12); box-shadow: 0 0 40px rgba(255,90,40,.6); }
+.btn-g { border: 1px solid rgba(255,255,255,.15); transition: all .3s; } .btn-g:hover { border-color: rgba(255,90,40,.7); background: rgba(255,90,40,.1); transform: translateY(-2px); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } .reveal { opacity: 1; transform: none; } .wm * { stroke-dashoffset: 0 !important; } .fu { opacity: 1 !important; } .word { transform: none !important; } }
 </style>
 </head>
 <body>
@@ -38,13 +50,21 @@ body { margin: 0; background: #000; color: #fff; font-family: 'Manrope', 'Helvet
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lucide-react@0.383.0/dist/umd/lucide-react.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
 <script type="text/babel">
 const { useState, useEffect, useRef } = React;
 const LR = window.lucideReact || window.LucideReact || {};
 const I = (n) => LR[n] || (() => null);
-const [Youtube, Twitch, Twitter, MessageSquare, ChevronDown, ArrowUpRight, Target, Crosshair, Timer, Users, Trophy, Clock, Play, Menu, X, Glasses, Gauge, Rocket, Radio] =
-  ['Youtube','Twitch','Twitter','MessageSquare','ChevronDown','ArrowUpRight','Target','Crosshair','Timer','Users','Trophy','Clock','Play','Menu','X','Glasses','Gauge','Rocket','Radio'].map(I);
+const [Youtube, MessageSquare, Play, ArrowUpRight, Check, Users, Eye, Video, Menu, X, Bell, Gauge, Rocket, Trophy, Crosshair, Target] =
+  ['Youtube','MessageSquare','Play','ArrowUpRight','Check','Users','Eye','Video','Menu','X','Bell','Gauge','Rocket','Trophy','Crosshair','Target'].map(I);
+
+const YT = 'https://www.youtube.com/channel/UClC8ramdKXZXUwQqTjuDRzw';
+const DISCORD = '#connect'; // paste your Discord invite link here
+
+/*STATS_START*/
+function useStats() { return { subs: 0, views: 0, videos: 0 }; } // update these numbers as the channel grows
+/*STATS_END*/
 
 function useReveal() {
   useEffect(() => {
@@ -54,193 +74,108 @@ function useReveal() {
   });
 }
 
+const LETTERS = [
+  ['0,10 35,110 70,10'],
+  ['18,10 52,10 70,28 70,92 52,110 18,110 0,92 0,28 18,10'],
+  ['0,10 0,92 18,110 52,110 70,92 70,10'],
+  ['0,10 0,110 70,110'],
+  ['70,28 52,10 18,10 0,28 0,92 18,110 52,110 70,92 70,60 38,60'],
+  ['70,10 0,10 0,110 70,110', '0,60 52,60'],
+];
+function Wordmark({ className }) {
+  return (
+    <svg className={className} viewBox="-14 -4 560 128" fill="none" role="img" aria-label="Voulge">
+      <defs><linearGradient id="g" gradientUnits="userSpaceOnUse" x1="-14" y1="0" x2="546" y2="128" spreadMethod="reflect"><stop offset="0" stopColor="#ffb347" /><stop offset=".5" stopColor="#fff4ea" /><stop offset="1" stopColor="#ff3b30" /><animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="1120 0" dur="8s" repeatCount="indefinite" /></linearGradient></defs>
+      <g className="wm" transform="skewX(-8) translate(10 0)" stroke="url(#g)" strokeWidth="15" strokeLinejoin="miter" strokeMiterlimit="20" strokeLinecap="butt">
+        {LETTERS.map((ps, i) => <g key={i} transform={`translate(${i * 90} 0)`}>{ps.map((p, j) => <polyline key={j} points={p} />)}</g>)}
+      </g>
+    </svg>
+  );
+}
+function Mark({ size = 26 }) {
+  return <svg width={size} height={size} viewBox="-8 -4 86 128" fill="none"><polyline points="0,10 35,110 70,10" stroke="#ff5a2a" strokeWidth="18" strokeLinejoin="miter" strokeMiterlimit="20" /></svg>;
+}
+
 function Nav() {
   const [open, setOpen] = useState(false);
-  const links = ['About', 'Services', 'Stats', 'Gallery'];
+  const [active, setActive] = useState('');
+  const links = ['Videos', 'About', 'Stats', 'Connect'];
+  useEffect(() => {
+    const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && setActive(e.target.id)), { rootMargin: '-45% 0px -50% 0px' });
+    links.forEach(id => { const el = document.getElementById(id.toLowerCase()); el && io.observe(el); });
+    return () => io.disconnect();
+  }, []);
   return (
-    <header className="fixed inset-x-0 top-0 z-50 backdrop-blur-xl bg-black/60 border-b border-white/5" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-      <div className="max-w-7xl mx-auto px-6 h-20 grid grid-cols-[1fr_auto_1fr] items-center">
-        <a href="#top" className="flex items-center gap-3 tracking-[.35em] text-sm font-semibold">
-          <span className="w-2 h-2 rounded-full bg-gold shadow-[0_0_14px_#d4af37]" /> VOULGE
-        </a>
-        <nav className="hidden md:flex gap-10 text-[12px] tracking-[.25em] uppercase text-neutral-400">
-          {links.map(l => <a key={l} href={'#' + l.toLowerCase()} className="hover:text-gold transition-colors">{l}</a>)}
+    <header className="fixed top-0 inset-x-0 z-50 px-4" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}>
+      <div className="glass max-w-5xl mx-auto px-5 h-14 flex items-center justify-between !rounded-full">
+        <a href="#top" className="flex items-center gap-2 font-extrabold tracking-[.2em] text-sm"><Mark /> VOULGE</a>
+        <nav className="hidden md:flex gap-8 text-sm text-slate-400">
+          {links.map(l => <a key={l} href={'#' + l.toLowerCase()} className={'relative transition-colors hover:text-white ' + (active === l.toLowerCase() ? 'text-white' : '')}>{l}<span className={'absolute -bottom-1.5 left-1/2 -translate-x-1/2 h-0.5 rounded bg-ac transition-all duration-300 ' + (active === l.toLowerCase() ? 'w-4' : 'w-0')} /></a>)}
         </nav>
-        <div className="flex justify-end items-center gap-4 col-start-3">
-          <a href="#gallery" className="hidden sm:inline-block px-6 py-2.5 rounded-full border border-gold/50 text-gold text-[11px] tracking-[.25em] uppercase transition-all hover:bg-gold hover:text-black hover:shadow-[0_0_30px_rgba(212,175,55,.5)]">Watch Videos</a>
-          <button className="md:hidden text-white" onClick={() => setOpen(!open)} aria-label="Menu">{open ? <X /> : <Menu />}</button>
+        <div className="flex items-center gap-3">
+          <a data-magnet href={YT} target="_blank" rel="noopener" className="btn-p hidden sm:inline-flex items-center gap-2 text-sm font-semibold px-5 py-2 rounded-full text-white">Subscribe</a>
+          <button className="md:hidden" onClick={() => setOpen(!open)} aria-label="Menu">{open ? <X size={22} /> : <Menu size={22} />}</button>
         </div>
       </div>
-      {open && <div className="md:hidden px-6 pb-6 flex flex-col gap-4 text-xs tracking-[.25em] uppercase text-neutral-300">
+      {open && <div className="glass md:hidden max-w-5xl mx-auto mt-2 p-5 flex flex-col gap-4 text-slate-300">
         {links.map(l => <a key={l} href={'#' + l.toLowerCase()} onClick={() => setOpen(false)}>{l}</a>)}
-        <a href="#gallery" className="text-gold">Watch Videos</a>
+        <a href={YT} target="_blank" rel="noopener" className="text-ac font-semibold">Subscribe</a>
       </div>}
     </header>
   );
 }
 
-function Hero() {
-  const stars = Array.from({ length: 40 }, (_, i) => ({ l: (i * 53) % 100, t: (i * 37) % 100, s: 1 + (i % 3), d: (i % 7) * .6 }));
-  return (
-    <section id="top" className="relative min-h-screen flex flex-col items-center justify-center pt-28 pb-16 overflow-hidden text-center">
-      {stars.map((s, i) => <span key={i} className="absolute rounded-full bg-white twinkle" style={{ left: s.l + '%', top: s.t + '%', width: s.s, height: s.s, opacity: .5, animationDelay: s.d + 's' }} />)}
-      <p className="eyebrow px-6 reveal in">Mastering Movement Through Veteran Innovation</p>
-      <div className="relative mt-6 w-[min(86vw,560px)] aspect-square float flex items-center justify-center">
-        <div className="absolute inset-[-20%] rounded-full bg-gold/15 blur-[110px]" />
-        <div className="orb absolute inset-0 rounded-full" />
-        <svg className="absolute inset-[-6%] w-[112%] h-[112%]" viewBox="0 0 100 100" fill="none">
-          <g className="spin" style={{ transformOrigin: '50px 50px' }}>
-            <circle cx="50" cy="50" r="48" stroke="#d4af37" strokeOpacity=".35" strokeWidth=".15" strokeDasharray="1 2.5" />
-            <circle cx="50" cy="2" r=".9" fill="#f6e3a1" />
-          </g>
-          <g className="spin-r" style={{ transformOrigin: '50px 50px' }}>
-            <ellipse cx="50" cy="50" rx="49" ry="14" stroke="#d4af37" strokeOpacity=".5" strokeWidth=".2" transform="rotate(-18 50 50)" />
-          </g>
-        </svg>
-        <h1 className="relative font-extralight text-5xl sm:text-7xl md:text-8xl tracking-[.3em] pl-[.3em] drop-shadow-[0_0_30px_rgba(0,0,0,.9)]">VOULGE</h1>
-      </div>
-      <p className="mt-4 text-neutral-400 font-light tracking-[.15em] px-6">Competitive Orion Drift. Movement, perfected.</p>
-      <a href="#about" className="mt-10 inline-flex flex-col items-center gap-2 text-[11px] tracking-[.35em] uppercase text-neutral-300 hover:text-gold transition-colors">
-        Discover More <ChevronDown size={18} className="bounce-y text-gold" />
-      </a>
-    </section>
-  );
-}
-
-function Platforms() {
-  const items = [[Youtube, 'YouTube'], [MessageSquare, 'Discord']];
-  return (
-    <section className="border-y border-white/5 bg-[#050505]">
-      <div className="max-w-3xl mx-auto grid grid-cols-2">
-        {items.map(([Icon, n], i) => (
-          <div key={n} className={`group py-10 flex items-center justify-center gap-3 text-neutral-600 hover:text-gold transition-colors ${i ? 'border-l border-white/5' : ''}`}>
-            <Icon size={22} className="transition-transform group-hover:scale-110" />
-            <span className="text-xs tracking-[.35em] uppercase">{n}</span>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function About() {
-  return (
-    <section id="about" className="max-w-6xl mx-auto px-6 py-32 grid md:grid-cols-2 gap-16 items-center">
-      <div className="reveal relative">
-        <div className="absolute -inset-6 bg-gold/10 blur-3xl rounded-full" />
-        <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-white/10 grayscale contrast-125" style={{ background: 'radial-gradient(circle at 30% 20%, #6b6b6b, #1a1a1a 55%, #000)' }}>
-          <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent 0 3px, rgba(0,0,0,.6) 3px 4px)' }} />
-          <Glasses size={150} strokeWidth={.6} className="absolute inset-0 m-auto text-white/60" />
-          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black to-transparent" />
-          <span className="absolute bottom-5 left-5 text-[10px] tracking-[.35em] text-white/60 uppercase">Photo placeholder</span>
-        </div>
-      </div>
-      <div className="reveal">
-        <p className="eyebrow mb-5">About Voulge</p>
-        <h2 className="text-4xl md:text-5xl font-light leading-tight tracking-wide">I Always Chase <span className="gold-text font-normal">The Best</span></h2>
-        <p className="mt-8 text-neutral-400 leading-[1.9] font-light">Voulge is a competitive Orion Drift player, movement specialist, and community guide creator. Hands-on time in the arena has gone into understanding the game’s physics: how momentum carries through a jetpack burn, how a clean wall-drift saves tenths of a second, and where the best players quietly gain their edge.</p>
-        <p className="mt-5 text-neutral-400 leading-[1.9] font-light">Every guide and breakdown is built to make advanced movement approachable, whether you’re chasing your first sub-30 run or tuning a tournament-ready line.</p>
-        <a href="#services" className="mt-10 inline-flex items-center gap-2 text-xs tracking-[.3em] uppercase text-gold group">Explore the craft <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" /></a>
-      </div>
-    </section>
-  );
-}
-
-function Services() {
-  const s = [
-    [Rocket, 'Advanced Mechanics', 'Jetpack control, wall-drifts and momentum chaining, broken down frame by frame so every technique becomes repeatable.'],
-    [Target, 'Competitive Match Strategy', 'Positioning, rotations and decision-making for ranked and tournament play, built from real match experience.'],
-    [Timer, 'Speedrun Coaching', 'Route planning and time-trial refinement to shave seconds and push toward sub-30 runs.'],
-    [Users, 'Community Guides', 'Clear, beginner-friendly walkthroughs and Discord sessions that bring new pilots up to speed.'],
-  ];
-  return (
-    <section id="services" className="bg-[#050505] border-y border-white/5 py-32">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-16 reveal"><p className="eyebrow mb-4">What I Do</p><h2 className="text-4xl md:text-5xl font-light tracking-wide">Built for <span className="gold-text">precision</span></h2></div>
-        <div className="grid md:grid-cols-2 gap-6">
-          {s.map(([Icon, t, d]) => (
-            <div key={t} className="panel reveal rounded-2xl p-8 flex gap-6">
-              <div className="shrink-0 w-14 h-14 rounded-full border border-gold/40 flex items-center justify-center text-gold bg-gold/5 shadow-[0_0_30px_rgba(212,175,55,.15)]"><Icon size={22} strokeWidth={1.5} /></div>
-              <div><h3 className="text-lg font-semibold tracking-wide">{t}</h3><p className="mt-3 text-neutral-400 font-light leading-relaxed">{d}</p></div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Counter({ to, suffix, label }) {
-  const [v, setV] = useState(0); const ref = useRef(null);
-  useEffect(() => {
-    const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return; io.disconnect();
-      const t0 = performance.now();
-      const step = (t) => { const p = Math.min(1, (t - t0) / 1800); setV(Math.round(to * (1 - Math.pow(1 - p, 3)))); if (p < 1) requestAnimationFrame(step); };
-      requestAnimationFrame(step);
-    }, { threshold: .4 });
-    io.observe(ref.current); return () => io.disconnect();
-  }, [to]);
-  return (
-    <div ref={ref} className="text-center py-10 px-4">
-      <div className="text-6xl md:text-7xl font-extralight gold-text">{v.toLocaleString()}{suffix}</div>
-      <div className="mt-4 text-[11px] tracking-[.35em] uppercase text-neutral-500">{label}</div>
-    </div>
-  );
-}
-
-const CHANNEL_ID = 'UClC8ramdKXZXUwQqTjuDRzw';
-const API_KEY = 'AIzaSyATKHSG80iqoxX_INll-feDafGtSxbRGIk'; // restrict this key to your site's domain in Google Cloud Console
-
-function useYouTubeStats() {
-  const [stats, setStats] = useState({ subs: 0, views: 0, videos: 0 });
-  useEffect(() => {
-    fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${CHANNEL_ID}&key=${API_KEY}`)
-      .then(r => r.json())
-      .then(d => {
-        const s = d.items && d.items[0] && d.items[0].statistics;
-        if (s) setStats({ subs: +s.subscriberCount || 0, views: +s.viewCount || 0, videos: +s.videoCount || 0 });
-      })
-      .catch(() => {}); // keep zeros if the request fails
-  }, []);
-  return stats;
-}
-
-function Stats() {
-  const STATS = useYouTubeStats();
-  return (
-    <section id="stats" className="relative max-w-6xl mx-auto px-6 py-28 reveal">
-      <div className="absolute inset-x-0 top-1/2 h-40 -translate-y-1/2 bg-gold/10 blur-[100px]" />
-      <div className="relative grid md:grid-cols-3 md:divide-x divide-white/10 border-y border-white/10">
-        <Counter to={STATS.subs} suffix="" label="Subscribers" />
-        <Counter to={STATS.views} suffix="" label="Total Views" />
-        <Counter to={STATS.videos} suffix="" label="Videos Posted" />
-      </div>
-      <p className="relative mt-8 text-center text-[11px] tracking-[.35em] uppercase text-neutral-500">Day one — follow along from the start</p>
-    </section>
-  );
-}
-
-const CASES = [
-  ['Sub-30 Second Time Trial', 'Time Trial', Gauge],
-  ['Advanced Jetpack Mechanics Guide', 'Guide', Rocket],
-  ['Competitive Match Highlights', 'Highlights', Trophy],
-  ['Wall-Drift Fundamentals', 'Tutorial', Crosshair],
-  ['Arena Flow: Route Breakdown', 'Analysis', Target],
-];
-
-function Tilt({ children, c }) {
+function Hero({ s }) {
   const ref = useRef(null);
   const move = (e) => {
     const r = ref.current.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
-    ref.current.style.transform = `perspective(900px) rotateY(${x * 14}deg) rotateX(${-y * 14}deg) translateY(-12px) scale(1.03)`;
+    ref.current.style.setProperty('--mx', ((e.clientX - r.left) / r.width - .5).toFixed(3));
+    ref.current.style.setProperty('--my', ((e.clientY - r.top) / r.height - .5).toFixed(3));
   };
-  const leave = () => { ref.current.style.transform = ''; };
-  return <article ref={ref} onMouseMove={move} onMouseLeave={leave} className="gcard rounded-2xl overflow-hidden bg-[#0a0a0a] w-[300px] sm:w-[400px] shrink-0">{children}</article>;
+  const rows = [[Users, 'Subscribers', s.subs], [Eye, 'Total Views', s.views], [Video, 'Videos', s.videos]];
+  return (
+    <section id="top" ref={ref} onMouseMove={move} className="bg-hero relative min-h-screen pt-32 pb-24 px-5 overflow-hidden flex flex-col items-center">
+      <div className="absolute top-1/3 -left-40 w-[30rem] h-[30rem] rounded-full bg-red-600/20 blur-[130px]" style={{ transform: 'translateY(calc(var(--p, 0) * 180px))' }} />
+      <div className="absolute bottom-0 -right-40 w-[30rem] h-[30rem] rounded-full bg-orange-500/15 blur-[130px]" style={{ transform: 'translateY(calc(var(--p, 0) * -120px))' }} />
+      <div className="relative text-center w-full" style={{ transform: 'translateY(calc(var(--p, 0) * 90px)) scale(calc(1 - var(--p, 0) * .08))', opacity: 'calc(1 - var(--p, 0) * 1.2)' }}>
+        <p className="fu inline-flex items-center gap-2 text-xs font-medium tracking-wide text-slate-300 px-4 py-1.5 rounded-full glass !rounded-full mb-8" style={{ '--d': '.1s' }}><span className="w-1.5 h-1.5 rounded-full bg-ac" /> Orion Drift creator</p>
+        <Wordmark className="mx-auto w-[min(90vw,780px)] h-auto" />
+        <p className="fu mt-8 text-lg md:text-xl text-slate-400 max-w-xl mx-auto" style={{ '--d': '1s' }}>Movement guides and competitive play. Mastering the drift, one run at a time.</p>
+        <div className="fu mt-9 flex flex-wrap gap-4 justify-center" style={{ '--d': '1.25s' }}>
+          <a data-magnet href={YT} target="_blank" rel="noopener" className="btn-p inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-white"><Youtube size={18} /> Watch on YouTube</a>
+          <a data-magnet href={DISCORD} className="btn-g inline-flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold"><MessageSquare size={18} /> Join Discord</a>
+        </div>
+      </div>
+      <div className="fu relative mt-16 w-full max-w-4xl grid md:grid-cols-[1fr_1.25fr_1fr] gap-5 items-center" style={{ '--d': '1.55s', transform: 'translateY(calc(var(--p, 0) * -50px))' }}>
+        <div className="pn hidden md:block" style={{ '--k': -14 }}>
+          <div className="glass p-5 fl"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center"><MessageSquare size={18} /></div><div><div className="text-sm font-semibold">Discord</div><div className="text-xs text-slate-400">Join the community</div></div></div></div>
+        </div>
+        <div className="pn" style={{ '--k': 8 }}>
+          <div className="glass overflow-hidden shadow-[0_30px_80px_-20px_rgba(255,90,40,.35)]">
+            <div className="flex items-center gap-2 px-5 py-3 border-b border-white/5"><span className="w-2.5 h-2.5 rounded-full bg-ac" /><span className="text-xs text-slate-400">Channel Overview</span></div>
+            <div className="p-3">{rows.map(([Icon, l, v]) => (
+              <div key={l} className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors"><Icon size={16} className="text-ac" /><span className="text-sm text-slate-300 flex-1">{l}</span><span className="text-sm font-semibold tabular-nums">{v.toLocaleString()}</span></div>
+            ))}</div>
+          </div>
+        </div>
+        <div className="pn hidden md:block" style={{ '--k': 16 }}>
+          <div className="glass p-5 fl" style={{ animationDelay: '-3s' }}><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-300 flex items-center justify-center"><Check size={18} /></div><div><div className="text-sm font-semibold">First video</div><div className="text-xs text-slate-400">Dropping soon</div></div></div></div>
+        </div>
+      </div>
+    </section>
+  );
 }
 
-function Gallery() {
+function Title({ k, children }) {
+  const words = String(children).split(' ');
+  return <div className="mb-12 reveal"><p className="text-ac text-sm font-semibold tracking-wide mb-3">{k}</p><h2 className="text-3xl md:text-5xl font-bold tracking-tight">{words.map((w, i) => <span key={i} className="inline-block overflow-hidden align-bottom pb-1 mr-[.25em]"><span className="word inline-block" style={{ '--i': i }}>{w}</span></span>)}</h2></div>;
+}
+
+const VIDS = [
+  ['Sub-30 Second Time Trial', 'Time Trial', Gauge], ['Advanced Jetpack Mechanics Guide', 'Guide', Rocket],
+  ['Competitive Match Highlights', 'Highlights', Trophy], ['Wall-Drift Fundamentals', 'Tutorial', Crosshair], ['Arena Flow: Route Breakdown', 'Analysis', Target],
+];
+function Videos() {
   const wrap = useRef(null), track = useRef(null), target = useRef(0), cur = useRef(0), fine = useRef(true);
   useEffect(() => {
     fine.current = window.matchMedia('(pointer: fine)').matches;
@@ -250,65 +185,247 @@ function Gallery() {
       const max = Math.max(0, track.current.scrollWidth - wrap.current.clientWidth);
       cur.current += (target.current * max - cur.current) * 0.07;
       track.current.style.transform = `translateX(${-cur.current}px)`;
+      const wr = wrap.current.getBoundingClientRect(), mid = wr.left + wr.width / 2;
+      [...track.current.children].forEach(el => { const b = el.getBoundingClientRect(); const d = Math.min(1, Math.abs(b.left + b.width / 2 - mid) / (wr.width * .6)); el.style.scale = (1 - d * .08).toFixed(3); el.style.opacity = (1 - d * .45).toFixed(3); });
       raf = requestAnimationFrame(tick);
     };
     tick(); return () => cancelAnimationFrame(raf);
   }, []);
-  const onMove = (e) => {
-    if (!fine.current) return;
-    const r = wrap.current.getBoundingClientRect();
-    target.current = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
-  };
+  const onMove = (e) => { if (!fine.current) return; const r = wrap.current.getBoundingClientRect(); target.current = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); };
   return (
-    <section id="gallery" className="py-32 overflow-hidden">
-      <div className="max-w-6xl mx-auto px-6 mb-14 reveal"><p className="eyebrow mb-4">Case Studies</p><h2 className="text-4xl md:text-5xl font-light tracking-wide">Featured <span className="gold-text">transmissions</span></h2></div>
-      <div ref={wrap} onMouseMove={onMove} className="hscroll overflow-x-auto [@media(pointer:fine)]:overflow-hidden py-10 px-6 md:px-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))]">
-        <div ref={track} className="flex flex-nowrap gap-8 w-max will-change-transform">
-          {CASES.map(([t, k, Icon], i) => (
-            <Tilt key={t}>
-              <div className="relative aspect-video flex items-center justify-center overflow-hidden" style={{ background: `radial-gradient(circle at ${30 + i * 12}% 30%, rgba(212,175,55,.35), #0a0a0a 65%)` }}>
-                <Icon size={120} strokeWidth={.5} className="absolute -right-4 -bottom-4 text-gold/20" />
-                <div className="w-14 h-14 rounded-full border border-gold/70 text-gold flex items-center justify-center backdrop-blur bg-black/40"><Play size={20} fill="currentColor" /></div>
-                <span className="absolute top-4 left-4 text-[9px] tracking-[.3em] uppercase px-3 py-1 rounded-full bg-black/60 border border-gold/40 text-gold">Coming soon</span>
+    <section id="videos" className="py-28 overflow-hidden">
+      <div className="max-w-6xl mx-auto px-5"><Title k="Videos">Latest uploads</Title></div>
+      <div ref={wrap} onMouseMove={onMove} className="hscroll overflow-x-auto [@media(pointer:fine)]:overflow-hidden py-6 px-5 md:px-[max(1.25rem,calc((100vw-72rem)/2+1.25rem))]">
+        <div ref={track} className="flex flex-nowrap gap-6 w-max will-change-transform">
+          {VIDS.map(([t, k, Icon], i) => (
+            <article key={t} className="glass lift overflow-hidden w-[300px] sm:w-[390px] shrink-0">
+              <div className="relative aspect-video flex items-center justify-center" style={{ background: `radial-gradient(circle at ${25 + i * 14}% 20%, rgba(255,90,40,.4), #140a08 70%)` }}>
+                <Icon size={110} strokeWidth={.6} className="absolute -right-3 -bottom-3 text-white/10" />
+                <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center"><Play size={20} fill="white" /></div>
+                <span className="absolute top-4 left-4 text-[11px] font-semibold px-3 py-1 rounded-full bg-black/50 border border-white/10">Coming soon</span>
               </div>
-              <div className="p-6"><div className="eyebrow !text-[10px] mb-2">{k}</div><h3 className="text-lg font-medium tracking-wide">{t}</h3><p className="mt-2 text-sm text-neutral-500 font-light">Placeholder — first upload lands here.</p></div>
-            </Tilt>
+              <div className="p-6"><div className="text-xs font-semibold text-ac mb-2">{k}</div><h3 className="text-lg font-semibold">{t}</h3><p className="mt-2 text-sm text-slate-500">First upload lands here.</p></div>
+            </article>
           ))}
         </div>
       </div>
-      <p className="max-w-6xl mx-auto px-6 text-[11px] tracking-[.35em] uppercase text-neutral-600 hidden [@media(pointer:fine)]:block">← Move your mouse to glide through →</p>
+      <p className="max-w-6xl mx-auto px-5 mt-4 text-xs text-slate-600 hidden [@media(pointer:fine)]:block">Move your mouse left and right to browse</p>
+    </section>
+  );
+}
+
+function About() {
+  const chips = ['Competitive play', 'Movement specialist', 'Community guides'];
+  return (
+    <section id="about" className="max-w-5xl mx-auto px-5 py-28">
+      <div className="glass reveal p-8 md:p-14 relative overflow-hidden">
+        <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-ac/20 blur-[100px]" />
+        <div className="relative max-w-2xl">
+          <p className="text-ac text-sm font-semibold mb-3">About</p>
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight">Hi, I’m <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-300 to-red-500">Voulge</span>.</h2>
+          <p className="mt-6 text-lg text-slate-400 leading-relaxed">I’m a competitive Orion Drift player, movement specialist and community guide creator. I break down how momentum, jetpack control and clean routes really work, so anyone can move faster and play smarter.</p>
+          <div className="mt-8 flex flex-wrap gap-3">{chips.map(c => <span key={c} className="px-4 py-2 rounded-full text-sm bg-white/5 border border-white/10">{c}</span>)}</div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Counter({ to, label, Icon }) {
+  const [v, setV] = useState(0), ref = useRef(null);
+  useEffect(() => {
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return; io.disconnect();
+      const t0 = performance.now();
+      const step = (t) => { const p = Math.min(1, (t - t0) / 1600); setV(Math.round(to * (1 - Math.pow(1 - p, 3)))); if (p < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    }, { threshold: .4 });
+    io.observe(ref.current); return () => io.disconnect();
+  }, [to]);
+  return (
+    <div ref={ref} className="p-8 text-center">
+      <Icon size={20} className="text-ac mx-auto mb-4" />
+      <div className="text-5xl md:text-6xl font-bold tracking-tight tabular-nums">{v.toLocaleString()}</div>
+      <div className="mt-3 text-sm text-slate-400">{label}</div>
+    </div>
+  );
+}
+function Stats({ s }) {
+  return (
+    <section id="stats" className="max-w-5xl mx-auto px-5 py-16">
+      <div className="glass reveal grid md:grid-cols-3 md:divide-x divide-white/10 shadow-[0_30px_90px_-30px_rgba(255,90,40,.35)]">
+        <Counter to={s.subs} label="Subscribers" Icon={Users} />
+        <Counter to={s.views} label="Total views" Icon={Eye} />
+        <Counter to={s.videos} label="Videos posted" Icon={Video} />
+      </div>
+      <p className="text-center mt-6 text-sm text-slate-500">Day one. Follow along from the start.</p>
+    </section>
+  );
+}
+
+function Connect() {
+  const cards = [[Youtube, 'YouTube', 'Guides, time trials and highlights. Subscribe so you don’t miss the first upload.', YT, '#ef4444', 'Subscribe'], [MessageSquare, 'Discord', 'Hang out, share runs and ask movement questions.', DISCORD, '#818cf8', 'Join the server']];
+  return (
+    <section id="connect" className="max-w-5xl mx-auto px-5 py-28">
+      <Title k="Connect">Find me here</Title>
+      <div className="grid md:grid-cols-2 gap-6">
+        {cards.map(([Icon, n, d, h, c, cta], i) => (
+          <div key={n} className="reveal" style={{ transitionDelay: i * 140 + 'ms' }}><a href={h} target={h.startsWith('http') ? '_blank' : undefined} rel="noopener" className="glass lift p-8 block group h-full">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6" style={{ background: c + '22', color: c }}><Icon size={22} /></div>
+            <h3 className="text-xl font-semibold">{n}</h3><p className="mt-2 text-slate-400">{d}</p>
+            <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold" style={{ color: c }}>{cta} <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" /></div>
+          </a></div>
+        ))}
+      </div>
     </section>
   );
 }
 
 function Footer() {
-  const col = (h, items) => (<div><h4 className="text-[11px] tracking-[.35em] uppercase text-white mb-5">{h}</h4><ul className="space-y-3 text-sm text-neutral-500 font-light">{items.map(i => <li key={i[0]}><a href={i[1]} className="hover:text-gold transition-colors">{i[0]}</a></li>)}</ul></div>);
   return (
-    <footer id="contact" className="relative border-t border-white/5 bg-[#030303] overflow-hidden">
-      <div className="absolute -bottom-40 left-1/2 -translate-x-1/2 w-[60rem] h-72 bg-gold/10 blur-[120px] rounded-full" />
-      <div className="relative max-w-6xl mx-auto px-6 pt-20 pb-10">
-        <div className="grid md:grid-cols-4 gap-12">
-          <div className="md:col-span-2">
-            <div className="flex items-center gap-3 tracking-[.35em] text-sm font-semibold"><span className="w-2 h-2 rounded-full bg-gold shadow-[0_0_14px_#d4af37]" /> VOULGE</div>
-            <p className="mt-5 max-w-sm text-neutral-500 font-light leading-relaxed">Competitive Orion Drift creator. Mastering movement, one drift at a time.</p>
-            <div className="mt-7 flex gap-3">
-              {[Youtube, MessageSquare].map((Icon, i) => <a key={i} href="#contact" onClick={e => e.preventDefault()} className="w-11 h-11 rounded-full border border-white/10 flex items-center justify-center text-neutral-400 transition-all hover:text-gold hover:border-gold/60 hover:shadow-[0_0_24px_rgba(212,175,55,.35)]"><Icon size={18} /></a>)}
-            </div>
-          </div>
-          {col('Explore', [['About', '#about'], ['Services', '#services'], ['Stats', '#stats'], ['Gallery', '#gallery']])}
-          {col('Platforms', [['YouTube', '#contact'], ['Discord', '#contact']])}
-        </div>
-        <div className="mt-16 pt-6 border-t border-white/5 flex flex-wrap justify-between gap-3 text-[11px] tracking-[.25em] uppercase text-neutral-600">
-          <span>© 2026 Voulge. All rights reserved.</span><span>Fly fast · Drift clean</span>
-        </div>
+    <footer className="border-t border-white/5 py-10 px-5"><Wordmark className="w-full max-w-4xl h-auto mx-auto mb-12 opacity-[.14]" />
+      <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-4 text-sm text-slate-500">
+        <div className="flex items-center gap-2 font-extrabold tracking-[.2em] text-slate-300"><Mark size={22} /> VOULGE</div>
+        <div className="flex gap-6"><a href={YT} target="_blank" rel="noopener" className="hover:text-white transition-colors">YouTube</a><a href={DISCORD} className="hover:text-white transition-colors">Discord</a></div>
+        <div>© 2026 Voulge</div>
       </div>
     </footer>
   );
 }
 
+function Marquee() {
+  const w = ['Movement', 'Guides', 'Competitive', 'Drift', 'Momentum', 'Precision'];
+  const group = (k) => (
+    <div key={k} className="flex shrink-0 items-center gap-10 pr-10">
+      {w.map((t, i) => (<React.Fragment key={t}><span className={'text-3xl md:text-5xl font-extrabold uppercase tracking-tight ' + (i % 2 ? 'mq-o' : 'text-white/90')}>{t}</span><span className="w-2.5 h-2.5 rotate-45 bg-ac shrink-0" /></React.Fragment>))}
+    </div>
+  );
+  return <div className="border-y border-white/5 py-6 overflow-hidden bg-black/30" aria-hidden="true"><div style={{ transform: 'translateX(calc(var(--prog, 0) * -420px)) skewX(calc(var(--v, 0) * -1deg))' }}><div className="flex w-max" style={{ animation: 'mq 32s linear infinite' }}>{[0, 1, 2, 3].map(group)}</div></div></div>;
+}
+
+function Cursor() {
+  const cv = useRef(null), ring = useRef(null), dot = useRef(null), orb = useRef(null);
+  useEffect(() => {
+    if (!window.matchMedia('(pointer: fine)').matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const c = cv.current, g = c.getContext('2d'), de = document.documentElement;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    let W = 0, H = 0;
+    const size = () => { W = innerWidth; H = innerHeight; c.width = W * dpr; c.height = H * dpr; c.style.width = W + 'px'; c.style.height = H + 'px'; g.setTransform(dpr, 0, 0, dpr, 0, 0); };
+    size(); addEventListener('resize', size);
+    const m = { x: -999, y: -999 }, r = { x: -999, y: -999 }, o = { x: innerWidth / 2, y: innerHeight / 2 };
+    const pts = Array.from({ length: 24 }, () => ({ x: -999, y: -999 }));
+    let hover = 0, hoverT = 0, down = 0, shown = false, raf;
+    const show = (v) => { ring.current.style.opacity = v; dot.current.style.opacity = v; };
+    const mv = (e) => {
+      m.x = e.clientX; m.y = e.clientY;
+      if (!shown) { shown = true; r.x = o.x = m.x; r.y = o.y = m.y; pts.forEach(p => { p.x = m.x; p.y = m.y; }); de.classList.add('has-cursor'); show(1); }
+      hoverT = e.target.closest && e.target.closest('a,button,.lift,[data-magnet]') ? 1 : 0;
+    };
+    const dn = () => { down = 1; }, up = () => { down = 0; }, lv = () => show(0), en = () => { if (shown) show(1); };
+    addEventListener('mousemove', mv); addEventListener('mousedown', dn); addEventListener('mouseup', up);
+    de.addEventListener('mouseleave', lv); de.addEventListener('mouseenter', en);
+    const tick = () => {
+      r.x += (m.x - r.x) * .17; r.y += (m.y - r.y) * .17;
+      o.x += (m.x - o.x) * .06; o.y += (m.y - o.y) * .06;
+      hover += (hoverT - hover) * .14;
+      pts[0].x += (m.x - pts[0].x) * .5; pts[0].y += (m.y - pts[0].y) * .5;
+      for (let i = 1; i < pts.length; i++) { pts[i].x += (pts[i - 1].x - pts[i].x) * .4; pts[i].y += (pts[i - 1].y - pts[i].y) * .4; }
+      g.clearRect(0, 0, W, H);
+      if (shown) {
+        g.globalCompositeOperation = 'lighter'; g.lineCap = 'round';
+        for (let i = pts.length - 1; i > 0; i--) {
+          const t = 1 - i / pts.length;
+          g.strokeStyle = `rgba(255,${Math.round(60 + 110 * (1 - t))},40,${(.6 * t).toFixed(3)})`;
+          g.lineWidth = 1 + 9 * t * t; g.shadowColor = 'rgba(255,90,40,.9)'; g.shadowBlur = 16 * t;
+          g.beginPath(); g.moveTo(pts[i].x, pts[i].y); g.lineTo(pts[i - 1].x, pts[i - 1].y); g.stroke();
+        }
+      }
+      orb.current.style.transform = `translate3d(${o.x - 320}px,${o.y - 320}px,0)`;
+      ring.current.style.transform = `translate3d(${r.x}px,${r.y}px,0) translate(-50%,-50%) scale(${(1 + hover * .9 - down * .3).toFixed(3)})`;
+      dot.current.style.transform = `translate3d(${m.x}px,${m.y}px,0) translate(-50%,-50%) scale(${(1 - hover * .6).toFixed(3)})`;
+      raf = requestAnimationFrame(tick);
+    };
+    tick();
+    return () => {
+      cancelAnimationFrame(raf); de.classList.remove('has-cursor');
+      removeEventListener('resize', size); removeEventListener('mousemove', mv); removeEventListener('mousedown', dn); removeEventListener('mouseup', up);
+      de.removeEventListener('mouseleave', lv); de.removeEventListener('mouseenter', en);
+    };
+  }, []);
+  return (
+    <>
+      <div ref={orb} className="fixed top-0 left-0 w-[640px] h-[640px] rounded-full pointer-events-none z-[5] hidden [@media(pointer:fine)]:block" style={{ background: 'radial-gradient(circle, rgba(255,110,50,.24), rgba(255,60,40,.09) 40%, transparent 68%)', mixBlendMode: 'screen' }} />
+      <canvas ref={cv} className="fixed inset-0 pointer-events-none z-[70] hidden [@media(pointer:fine)]:block" />
+      <div ref={ring} className="fixed top-0 left-0 w-10 h-10 rounded-full pointer-events-none z-[71] opacity-0 hidden [@media(pointer:fine)]:block transition-opacity duration-300" style={{ border: '1.5px solid rgba(255,140,60,.8)', boxShadow: '0 0 22px rgba(255,90,40,.55), inset 0 0 16px rgba(255,90,40,.3)' }} />
+      <div ref={dot} className="fixed top-0 left-0 w-2 h-2 rounded-full pointer-events-none z-[72] opacity-0 hidden [@media(pointer:fine)]:block transition-opacity duration-300" style={{ background: '#fff', boxShadow: '0 0 12px 3px rgba(255,120,50,.9)' }} />
+    </>
+  );
+}
+
 function App() {
   useReveal();
-  return <div><Nav /><Hero /><Platforms /><About /><Services /><Stats /><Gallery /><Footer /></div>;
+  const s = useStats();
+  useEffect(() => {
+    const fine = window.matchMedia('(pointer: fine)').matches;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let lenis, raf, raf2;
+    if (window.Lenis && !reduce) {
+      lenis = new window.Lenis({ lerp: 0.07, wheelMultiplier: 0.9, smoothWheel: true });
+      lenis.on('scroll', ({ velocity }) => document.documentElement.style.setProperty('--v', Math.max(-8, Math.min(8, velocity * 0.35)).toFixed(2)));
+      const loop = (t) => { lenis.raf(t); raf = requestAnimationFrame(loop); };
+      raf = requestAnimationFrame(loop);
+    }
+    const click = (e) => {
+      const a = e.target.closest && e.target.closest('a[href^="#"]');
+      if (!a || !lenis) return;
+      const id = a.getAttribute('href');
+      if (id.length < 2 || !document.querySelector(id)) return;
+      e.preventDefault();
+      lenis.scrollTo(id === '#top' ? 0 : id, { offset: id === '#top' ? 0 : -80, duration: 1.5 });
+    };
+    const root = document.documentElement.style;
+    let last = -1;
+    const upd = () => {
+      const y = window.scrollY, h = window.innerHeight;
+      if (y !== last) {
+        const dir = y > last + 2 && y > 240 ? 'hide' : (y < last - 2 || y <= 240 ? 'show' : null);
+        if (dir) document.documentElement.dataset.nav = dir;
+        last = y;
+        const max = document.documentElement.scrollHeight - h;
+        root.setProperty('--p', Math.min(1, y / h).toFixed(4));
+        root.setProperty('--prog', (max > 0 ? y / max : 0).toFixed(4));
+      }
+      raf2 = requestAnimationFrame(upd);
+    };
+    upd();
+    const spot = (e) => {
+      const c = e.target.closest && e.target.closest('.lift');
+      if (!c) return;
+      const r = c.getBoundingClientRect();
+      c.style.setProperty('--lx', (e.clientX - r.left) + 'px');
+      c.style.setProperty('--ly', (e.clientY - r.top) + 'px');
+    };
+    document.addEventListener('click', click);
+    document.addEventListener('mousemove', spot);
+    const mags = fine ? [...document.querySelectorAll('[data-magnet]')].map(el => {
+      const mv = (e) => { const r = el.getBoundingClientRect(); el.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * .25}px,${(e.clientY - r.top - r.height / 2) * .35}px)`; };
+      const lv = () => { el.style.transform = ''; };
+      el.addEventListener('mousemove', mv); el.addEventListener('mouseleave', lv);
+      return () => { el.removeEventListener('mousemove', mv); el.removeEventListener('mouseleave', lv); };
+    }) : [];
+    return () => {
+      cancelAnimationFrame(raf); cancelAnimationFrame(raf2);
+      if (lenis) lenis.destroy();
+      document.removeEventListener('click', click); document.removeEventListener('mousemove', spot);
+      mags.forEach(f => f());
+    };
+  }, []);
+  return (
+    <div>
+      <div className="fixed top-0 left-0 w-full h-[3px] z-[60] origin-left pointer-events-none" style={{ transform: 'scaleX(var(--prog, 0))', background: 'linear-gradient(90deg,#ff3b30,#ff8a1f)', boxShadow: '0 0 14px rgba(255,90,40,.8)' }} />
+      <Cursor /><Nav /><Hero s={s} /><Marquee /><Videos /><About /><Stats s={s} /><Connect /><Footer />
+    </div>
+  );
 }
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
