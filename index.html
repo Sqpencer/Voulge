@@ -63,7 +63,21 @@ const YT = 'https://www.youtube.com/channel/UClC8ramdKXZXUwQqTjuDRzw';
 const DISCORD = '#connect'; // paste your Discord invite link here
 
 /*STATS_START*/
-function useStats() { return { subs: 0, views: 0, videos: 0 }; } // update these numbers as the channel grows
+const YT_KEY = 'YOUR_API_KEY'; // paste your YouTube Data API v3 key (restrict it to voulge.vercel.app/* in Google Cloud)
+const YT_ID = 'UClC8ramdKXZXUwQqTjuDRzw';
+function useStats() {
+  const [s, setS] = useState({ subs: 0, views: 0, videos: 0 });
+  useEffect(() => {
+    fetch(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${YT_ID}&key=${YT_KEY}`)
+      .then(r => r.json())
+      .then(d => {
+        const x = d.items && d.items[0] && d.items[0].statistics;
+        if (x) setS({ subs: +x.subscriberCount || 0, views: +x.viewCount || 0, videos: +x.videoCount || 0 });
+      })
+      .catch(() => {});
+  }, []);
+  return s;
+}
 /*STATS_END*/
 
 function useReveal() {
