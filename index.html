@@ -174,6 +174,8 @@ h1 span:nth-child(2)>b{animation-delay:1.42s}h1 span:nth-child(3)>b{animation-de
 .br div i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--p),var(--pink));transition:width 1.4s cubic-bezier(.2,.8,.2,1) .3s}
 .rv.in .br div i{width:var(--w,35%)}
 .br b{flex:none;width:34px;text-align:right;color:var(--muted);font-weight:500}
+.kv{display:flex;justify-content:space-between;gap:12px;margin:12px 0;font-size:.84rem;color:var(--body)}.kv b{color:var(--text);font-weight:600}
+.vl a{display:flex;justify-content:space-between;gap:12px;margin:12px 0;font-size:.84rem;color:var(--body);transition:color .2s}.vl a:hover{color:var(--text)}.vl a span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.vl a em{flex:none;font-style:normal;color:var(--muted)}
 .logos{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:20px}
 @media(max-width:860px){.logos{grid-template-columns:repeat(3,1fr)}}
 .logos div{aspect-ratio:2/1;border:1px dashed var(--line);border-radius:16px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;transition:all .3s}
@@ -288,9 +290,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
     <div class="stat tl rv" data-a="zoom" style="--d:.24s"><b class="t" id="s-views">&mdash;</b><span id="s-views-l">Monthly views</span></div>
   </div>
   <div class="grid" style="margin-top:18px">
-    <div class="dm tl rv" data-a="left"><h3>Age</h3><div class="br"><em>13&ndash;17</em><div><i style="--w:22%"></i></div><b>&mdash;</b></div><div class="br"><em>18&ndash;24</em><div><i style="--w:46%"></i></div><b>&mdash;</b></div><div class="br"><em>25&ndash;34</em><div><i style="--w:28%"></i></div><b>&mdash;</b></div><div class="br"><em>35+</em><div><i style="--w:10%"></i></div><b>&mdash;</b></div></div>
-    <div class="dm tl rv" style="--d:.1s"><h3>Top countries</h3><div class="br"><em>Country 1</em><div><i style="--w:50%"></i></div><b>&mdash;</b></div><div class="br"><em>Country 2</em><div><i style="--w:30%"></i></div><b>&mdash;</b></div><div class="br"><em>Country 3</em><div><i style="--w:18%"></i></div><b>&mdash;</b></div><div class="br"><em>Other</em><div><i style="--w:12%"></i></div><b>&mdash;</b></div></div>
-    <div class="dm tl rv" data-a="right" style="--d:.2s"><h3>Platforms</h3><div class="br"><em>YouTube</em><div><i style="--w:80%"></i></div><b>&mdash;</b></div><div class="br"><em>Shorts</em><div><i style="--w:40%"></i></div><b>&mdash;</b></div><div class="br"><em>Discord</em><div><i style="--w:25%"></i></div><b>&mdash;</b></div></div>
+    <div class="dm tl rv" data-a="left"><h3>Channel</h3><div class="kv"><span>Videos published</span><b id="k-vids">&mdash;</b></div><div class="kv"><span>On YouTube since</span><b id="k-since">&mdash;</b></div><div class="kv"><span>Avg. likes per video</span><b id="k-likes">&mdash;</b></div><div class="kv"><span>Avg. comments per video</span><b id="k-coms">&mdash;</b></div></div>
+    <div class="dm tl rv" style="--d:.1s"><h3>Top videos</h3><div class="vl" id="top-list"><a><span>&mdash;</span><em></em></a><a><span>&mdash;</span><em></em></a><a><span>&mdash;</span><em></em></a></div></div>
+    <div class="dm tl rv" data-a="right" style="--d:.2s"><h3>Recent uploads</h3><div class="vl" id="new-list"><a><span>&mdash;</span><em></em></a><a><span>&mdash;</span><em></em></a><a><span>&mdash;</span><em></em></a></div></div>
   </div>
   <div style="margin-top:60px"><div class="kick rv">Past collaborations</div>
     <div class="logos rv" style="--d:.08s"><div>Brand</div><div>Brand</div><div>Brand</div><div>Brand</div><div>Brand</div><div>Brand</div></div></div>
@@ -429,12 +431,17 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
     if(v.length){var tv=0,te=0;v.forEach(function(x){tv+=x.views;te+=x.likes+x.com});set('s-avg',fmt(Math.round(tv/v.length)));if(tv)set('s-eng',(te/tv*100).toFixed(1)+'%')}
     if(v[0]){var a=document.getElementById('lv');a.href='https://www.youtube.com/watch?v='+v[0].id;a.target='_blank';a.rel='noopener';set('lv-t',v[0].t);thumb(a.querySelector('.th'),v[0].th)}
     var top=v.slice().sort(function(a,b){return b.views-a.views});
+    if(s.videoCount)set('k-vids',fmt(+s.videoCount));
+    if(d.joined)set('k-since',new Date(d.joined).getFullYear());
+    if(v.length){var tl=0,tc=0;v.forEach(function(x){tl+=x.likes;tc+=x.com});set('k-likes',fmt(Math.round(tl/v.length)));set('k-coms',fmt(Math.round(tc/v.length)))}
+    function fill(id,arr){var el=document.getElementById(id);if(!arr.length)return;el.innerHTML='';arr.slice(0,3).forEach(function(x){var a=document.createElement('a'),t=document.createElement('span'),e=document.createElement('em');a.href='https://www.youtube.com/watch?v='+x.id;a.target='_blank';a.rel='noopener';t.textContent=x.t;e.textContent=fmt(x.views)+' views';a.appendChild(t);a.appendChild(e);el.appendChild(a)})}
+    fill('top-list',top);fill('new-list',v);
     $('.wc[data-c="video"]').forEach(function(c,i){var x=top[i];if(!x)return;c.href='https://www.youtube.com/watch?v='+x.id;c.target='_blank';c.rel='noopener';c.querySelector('b').textContent=x.t;c.querySelector('.tx span').textContent=fmt(x.views)+' views';thumb(c.querySelector('.th'),x.th)});
   }
   function loadYT(){
     if(!YT_HANDLE){YT_HANDLE=((YOUTUBE_URL||'').match(/@[\w.\-]+/)||[''])[0]}
     if(!YOUTUBE_API_KEY||!(YT_CHANNEL_ID||YT_HANDLE))return;
-    var c=null;try{c=JSON.parse(sessionStorage.getItem('yt_v2'))}catch(e){}
+    var c=null;try{c=JSON.parse(sessionStorage.getItem('yt_v3'))}catch(e){}
     if(c&&Date.now()-c.t<18e5)return paint(c.d);
     var p=YT_CHANNEL_ID?{id:YT_CHANNEL_ID}:{forHandle:YT_HANDLE};
     ytGet('channels',Object.assign({part:'statistics,contentDetails,snippet,brandingSettings'},p)).then(function(r){
@@ -443,8 +450,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
         var ids=pl.items.map(function(i){return i.contentDetails.videoId}).join(',');
         return ytGet('videos',{part:'snippet,statistics',id:ids}).then(function(v){
           var tn=ch.snippet.thumbnails||{},bi=ch.brandingSettings&&ch.brandingSettings.image&&ch.brandingSettings.image.bannerExternalUrl;
-          var d={s:ch.statistics,pfp:(tn.high||tn.medium||tn.default||{}).url||'',banner:bi?bi+'=w1920':'',v:v.items.map(function(x){var t=x.snippet.thumbnails;return{id:x.id,t:x.snippet.title,th:(t.maxres||t.high||t.medium).url,views:+x.statistics.viewCount||0,likes:+x.statistics.likeCount||0,com:+x.statistics.commentCount||0,at:x.snippet.publishedAt}})};
-          try{sessionStorage.setItem('yt_v2',JSON.stringify({t:Date.now(),d:d}))}catch(e){}
+          var d={s:ch.statistics,joined:ch.snippet.publishedAt,pfp:(tn.high||tn.medium||tn.default||{}).url||'',banner:bi?bi+'=w1920':'',v:v.items.map(function(x){var t=x.snippet.thumbnails;return{id:x.id,t:x.snippet.title,th:(t.maxres||t.high||t.medium).url,views:+x.statistics.viewCount||0,likes:+x.statistics.likeCount||0,com:+x.statistics.commentCount||0,at:x.snippet.publishedAt}})};
+          try{sessionStorage.setItem('yt_v3',JSON.stringify({t:Date.now(),d:d}))}catch(e){}
           paint(d);
         });
       });
