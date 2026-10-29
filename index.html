@@ -114,12 +114,21 @@ h1 span:nth-child(2)>b{animation-delay:1.42s}h1 span:nth-child(3)>b{animation-de
 .frame{position:relative;aspect-ratio:4/5;border-radius:30px;border:1px solid var(--line);overflow:hidden;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.12),transparent 60%),radial-gradient(circle at 80% 90%,rgba(255,255,255,.08),transparent 55%),var(--card);box-shadow:0 40px 90px -30px var(--glow)}
 .frame::before{content:"";position:absolute;left:50%;top:26%;width:34%;aspect-ratio:1;translate:-50% 0;border-radius:50%;background:rgba(255,255,255,.14)}
 .frame::after{content:"";position:absolute;left:50%;top:56%;width:68%;height:60%;translate:-50% 0;border-radius:50% 50% 0 0;background:rgba(255,255,255,.1)}
+.frame.has::before,.frame.has::after{display:none}
 .frame span{position:absolute;left:0;right:0;bottom:16px;text-align:center;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.7);z-index:1}
 .ring{position:absolute;inset:-22px;border-radius:44px;border:1px dashed rgba(255,255,255,.3);animation:spin 40s linear infinite;pointer-events:none}
 .ring.r2{inset:-44px;border-radius:58px;border-color:rgba(255,255,255,.18);animation-duration:60s;animation-direction:reverse}
 .fc{position:absolute;padding:9px 15px;border-radius:999px;background:var(--glass);backdrop-filter:blur(10px);border:1px solid var(--line);font-size:.76rem;font-weight:600;animation:bob 5s ease-in-out infinite;translate:calc(var(--mx,0)*34px) calc(var(--my,0)*34px)}
 .fc.a{left:-34px;top:14%}.fc.b{right:-24px;bottom:18%;animation-delay:-2.5s}
 @media(max-width:560px){.fc.a{left:-8px}.fc.b{right:-8px}}
+.hc{position:relative;padding:26px;border:1px solid var(--line);border-radius:30px;background:var(--card);box-shadow:0 40px 90px -30px var(--glow);overflow:hidden}
+.hc .live{display:inline-flex;align-items:center;gap:8px;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--green);font-weight:600}
+.hc .live i{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:tw 2s infinite}
+.hc-big{margin-top:18px}.hc-big b{display:block;font-size:3.4rem;letter-spacing:-.05em;line-height:1;font-weight:700}
+.hc-big span,.hc-row span{display:block;margin-top:6px;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.hc-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+.hc-row b{font-size:1.5rem;letter-spacing:-.04em;font-weight:700;line-height:1.2}
+.hc-v{margin-top:22px;border-radius:18px}.hc-v .th{aspect-ratio:16/9}.hc-v .tx{padding:12px 14px 14px}.hc-v .tx b{font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cue{position:absolute;left:50%;bottom:34px;translate:-50% 0;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:.66rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);animation:fade 1s 2.2s both}
 .cue i{width:1px;height:44px;background:linear-gradient(var(--p2),transparent);transform-origin:top;animation:cue 2s ease-in-out infinite}
 @keyframes cue{0%{transform:scaleY(0)}50%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
@@ -237,9 +246,12 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
       <div class="act"><a class="btn btn-p" href="#latest" data-go="latest">&#9654;&nbsp; Watch my latest video</a><a class="btn btn-g" href="#">Subscribe</a></div>
     </div>
     <div class="hp" data-speed=".06">
-      <div class="ring"></div><div class="ring r2"></div>
-      <div class="frame"><span>Your photo here</span></div>
-      <div class="fc a">YouTube</div><div class="fc b">Orion Drift</div>
+      <div class="hc">
+        <span class="live"><i></i>Live channel stats</span>
+        <div class="hc-big"><b id="h-subs">&mdash;</b><span>Subscribers</span></div>
+        <div class="hc-row"><div><b id="h-views">&mdash;</b><span>Total views</span></div><div><b id="h-vids">&mdash;</b><span>Videos</span></div></div>
+        <a class="vc hc-v" id="h-lv" href="#"><div class="th"><i></i><u></u></div><div class="tx"><span>Latest upload</span><b id="h-lt">Your latest video</b></div></a>
+      </div>
     </div>
   </div>
   <a class="cue" href="#latest" data-go="latest"><span>Scroll</span><i></i></a>
@@ -335,6 +347,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
   var YOUTUBE_URL="https://www.youtube.com/@Voulge";          // your channel link, used by the Subscribe buttons
   var DISCORD_URL="https://discord.gg/CkDYG5kFyK";          // your Discord server invite link
   var PFP_URL="https://i.imgur.com/8Pq3GWh.jpeg";              // optional: profile picture (blank = use your YouTube pfp)
+  var ABOUT_PHOTO_URL="https://i.imgur.com/nTgUQI1.jpeg";  // photo shown in the About section (imgur link)
   var BANNER_URL="https://i.imgur.com/R4lNRc0.jpeg";           // optional: banner image (blank = use your YouTube banner)
   var DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/1565175240445923429/wqEuc7zNtvDxQxM_xpN9lSb_I2OhGqEd-Qm_2MWdBbrf0VWb6MoAly9NBOv_tXNtGxw7";  // Discord: channel settings > Integrations > Webhooks
   var CONTACT_EMAIL="";        // optional fallback if no webhook is set
@@ -418,6 +431,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
     if(pfp&&p){p.style.backgroundImage='url("'+pfp+'")';p.textContent=''}
   }
   setArt(PFP_URL,BANNER_URL);
+  (function(){var u=ABOUT_PHOTO_URL||PFP_URL,f=document.querySelector('.ab .frame');if(!u||!f)return;f.style.backgroundImage='url("'+u+'")';f.style.backgroundSize='cover';f.style.backgroundPosition='center';f.classList.add('has');var sp=f.querySelector('span');if(sp)sp.remove()})();
   // ---- YouTube stats (YouTube Data API v3) ----
   var fmt=function(n){return new Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(n)};
   function set(id,t){document.getElementById(id).textContent=t}
@@ -429,6 +443,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
     if(!s.hiddenSubscriberCount)set('s-subs',fmt(+s.subscriberCount));
     set('s-views',fmt(+s.viewCount));set('s-views-l','Total views');
     if(v.length){var tv=0,te=0;v.forEach(function(x){tv+=x.views;te+=x.likes+x.com});set('s-avg',fmt(Math.round(tv/v.length)));if(tv)set('s-eng',(te/tv*100).toFixed(1)+'%')}
+    if(!s.hiddenSubscriberCount)set('h-subs',fmt(+s.subscriberCount));
+    set('h-views',fmt(+s.viewCount));if(s.videoCount)set('h-vids',fmt(+s.videoCount));
+    if(v[0]){var h=document.getElementById('h-lv');h.href='https://www.youtube.com/watch?v='+v[0].id;h.target='_blank';h.rel='noopener';set('h-lt',v[0].t);thumb(h.querySelector('.th'),v[0].th)}
     if(v[0]){var a=document.getElementById('lv');a.href='https://www.youtube.com/watch?v='+v[0].id;a.target='_blank';a.rel='noopener';set('lv-t',v[0].t);thumb(a.querySelector('.th'),v[0].th)}
     var top=v.slice().sort(function(a,b){return b.views-a.views});
     if(s.videoCount)set('k-vids',fmt(+s.videoCount));
