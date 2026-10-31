@@ -7,16 +7,22 @@
 //
 // Endpoints (what your site already calls):
 //   GET  /api/posts                      -> { posts: [{ id, text, image, at }, ...] }   newest first
-//   POST /api/posts  { op: 'check' }                       -> { ok: true }
-//   POST /api/posts  { op: 'create', text, image }         -> { post }
-//   POST /api/posts  { op: 'delete', id }                  -> { ok: true }
+//   GET  /api/posts?img=<id>             -> the uploaded image (cached by the browser/CDN)
+//   POST /api/posts  { op: 'check' }                                  -> { ok: true }
+//   POST /api/posts  { op: 'create', text, imageData | image }        -> { post }
+//        imageData = a small JPEG/PNG/WebP data URL (the page shrinks uploads before sending)
+//        image     = optional https link (older posts / manual use)
+//   POST /api/posts  { op: 'delete', id }                             -> { ok: true }
 //   POST requests need the header  Authorization: Bearer <ADMIN_PASSWORD>
 
 const crypto = require('crypto');
 
 const KEY = 'voulge:posts';
-const MAX_POSTS = 500;     // oldest posts are dropped past this
-const MAX_SHOWN = 100;     // how many the site loads
+const IMG = 'voulge:img:';
+const MAX_POSTS = 300;           // oldest posts (and their images) are dropped past this
+const MAX_SHOWN = 100;           // how many the site loads
+const MAX_IMG_CHARS = 720000;    // ~500 KB image after base64
+const IMG_URL = /^\/api\/posts\?img=([a-f0-9-]{36})$/;
 
 async function redis(cmd) {
   const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
@@ -36,6 +42,14 @@ function sameSecret(a, b) {
   return crypto.timingSafeEqual(h(a), h(b));
 }
 
+// delete the uploaded image that belongs to a stored post row (if it has one)
+async function dropImage(row) {
+  try {
+    const m = IMG_URL.exec(JSON.parse(row).image || '');
+    if (m) await redis(['DEL', IMG + m[1]]);
+  } catch (e) { /* ignore */ }
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   const send = (code, body) => res.status(code).json(body);
@@ -46,8 +60,18 @@ module.exports = async (req, res) => {
   if (!hasStore) return send(500, { error: 'storage_not_configured' });
 
   try {
-    // ---------- public: read posts ----------
+    // ---------- public: read ----------
     if (req.method === 'GET') {
+      const imgId = new URL(req.url, 'http://x').searchParams.get('img');
+      if (imgId !== null) {
+        if (!/^[a-f0-9-]{36}$/.test(imgId)) return send(404, { error: 'not_found' });
+        const data = await redis(['GET', IMG + imgId]);
+        const m = data && /^data:(image\/(?:jpeg|png|webp));base64,(.+)$/.exec(data);
+        if (!m) return send(404, { error: 'not_found' });
+        res.setHeader('Content-Type', m[1]);
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        return res.status(200).end(Buffer.from(m[2], 'base64'));
+      }
       const rows = await redis(['LRANGE', KEY, 0, MAX_SHOWN - 1]);
       const posts = (rows || [])
         .map((s) => { try { return JSON.parse(s); } catch { return null; } })
@@ -84,12 +108,25 @@ module.exports = async (req, res) => {
 
     if (body.op === 'create') {
       const text = String(body.text || '').trim().slice(0, 2000);
-      const image = String(body.image || '').trim();
-      if (!text && !image) return send(400, { error: 'empty' });
-      if (image && (!/^https:\/\/\S+$/.test(image) || image.length > 500)) return send(400, { error: 'bad_image' });
-      const post = { id: crypto.randomUUID(), text, image, at: new Date().toISOString() };
+      const imageData = String(body.imageData || '');
+      let image = '';
+      if (imageData) {
+        if (imageData.length > MAX_IMG_CHARS) return send(413, { error: 'image_too_large' });
+        if (!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(imageData)) return send(400, { error: 'bad_image' });
+      } else if (body.image) {
+        image = String(body.image).trim();
+        if (!/^https:\/\/\S+$/.test(image) || image.length > 500) return send(400, { error: 'bad_image' });
+      }
+      if (!text && !image && !imageData) return send(400, { error: 'empty' });
+
+      const id = crypto.randomUUID();
+      if (imageData) {
+        await redis(['SET', IMG + id, imageData]);
+        image = '/api/posts?img=' + id;
+      }
+      const post = { id, text, image, at: new Date().toISOString() };
       await redis(['LPUSH', KEY, JSON.stringify(post)]);
-      await redis(['LTRIM', KEY, 0, MAX_POSTS - 1]);
+      if ((await redis(['LLEN', KEY])) > MAX_POSTS) await dropImage(await redis(['RPOP', KEY]));
       return send(200, { post });
     }
 
@@ -99,6 +136,7 @@ module.exports = async (req, res) => {
       const row = rows.find((s) => { try { return JSON.parse(s).id === id; } catch { return false; } });
       if (!row) return send(404, { error: 'not_found' });
       await redis(['LREM', KEY, 1, row]);
+      await dropImage(row);
       return send(200, { ok: true });
     }
 
