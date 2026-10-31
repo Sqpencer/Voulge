@@ -1,87 +1,148 @@
-// Vercel serverless function: /api/posts
-// GET  -> public list of posts
-// POST -> owner only (needs the ADMIN_PASSWORD env var as a Bearer token): check / create / delete
+// api/posts.js — owner-only community posts for Voulge (Vercel Serverless Function)
+//
+// Storage : Upstash Redis (free) from the Vercel Marketplace. No npm packages needed.
+// Env vars: ADMIN_PASSWORD            (you choose it; it's the owner sign-in password)
+//           KV_REST_API_URL           (added automatically when you connect Upstash Redis)
+//           KV_REST_API_TOKEN         (added automatically when you connect Upstash Redis)
+//
+// Endpoints (what your site already calls):
+//   GET  /api/posts                      -> { posts: [{ id, text, image, at }, ...] }   newest first
+//   GET  /api/posts?img=<id>             -> the uploaded image (cached by the browser/CDN)
+//   POST /api/posts  { op: 'check' }                                  -> { ok: true }
+//   POST /api/posts  { op: 'create', text, imageData | image }        -> { post }
+//        imageData = a small JPEG/PNG/WebP data URL (the page shrinks uploads before sending)
+//        image     = optional https link (older posts / manual use)
+//   POST /api/posts  { op: 'delete', id }                             -> { ok: true }
+//   POST requests need the header  Authorization: Bearer <ADMIN_PASSWORD>
+
 const crypto = require('crypto');
 
 const KEY = 'voulge:posts';
-const REDIS_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-const REDIS_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+const IMG = 'voulge:img:';
+const MAX_POSTS = 300;           // oldest posts (and their images) are dropped past this
+const MAX_SHOWN = 100;           // how many the site loads
+const MAX_IMG_CHARS = 720000;    // ~500 KB image after base64
+const IMG_URL = /^\/api\/posts\?img=([a-f0-9-]{36})$/;
 
 async function redis(cmd) {
-  const r = await fetch(REDIS_URL, {
+  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  const r = await fetch(url, {
     method: 'POST',
-    headers: { Authorization: 'Bearer ' + REDIS_TOKEN, 'Content-Type': 'application/json' },
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
     body: JSON.stringify(cmd),
   });
   const j = await r.json();
-  if (j.error) throw new Error(j.error);
+  if (!r.ok || j.error) throw new Error(j.error || 'redis ' + r.status);
   return j.result;
 }
-async function loadPosts() {
-  const raw = await redis(['GET', KEY]);
-  try { const a = JSON.parse(raw); return Array.isArray(a) ? a : []; } catch (e) { return []; }
-}
-const savePosts = (posts) => redis(['SET', KEY, JSON.stringify(posts)]);
 
-const sha = (s) => crypto.createHash('sha256').update(String(s)).digest();
-function isOwner(req) {
-  const pw = process.env.ADMIN_PASSWORD;
-  if (!pw) return false;
-  const h = req.headers.authorization || '';
-  const given = h.startsWith('Bearer ') ? h.slice(7) : '';
-  return crypto.timingSafeEqual(sha(given), sha(pw));
+function sameSecret(a, b) {
+  const h = (s) => crypto.createHash('sha256').update(String(s)).digest();
+  return crypto.timingSafeEqual(h(a), h(b));
+}
+
+// delete the uploaded image that belongs to a stored post row (if it has one)
+async function dropImage(row) {
+  try {
+    const m = IMG_URL.exec(JSON.parse(row).image || '');
+    if (m) await redis(['DEL', IMG + m[1]]);
+  } catch (e) { /* ignore */ }
 }
 
 module.exports = async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  const send = (code, body) => res.status(code).json(body);
+
+  const hasStore =
+    (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) ||
+    (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+  if (!hasStore) return send(500, { error: 'storage_not_configured' });
+
   try {
-    if (!REDIS_URL || !REDIS_TOKEN) return res.status(500).json({ error: 'storage_not_configured' });
-
+    // ---------- public: read ----------
     if (req.method === 'GET') {
-      res.setHeader('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=60');
-      return res.status(200).json({ posts: await loadPosts() });
+      const imgId = new URL(req.url, 'http://x').searchParams.get('img');
+      if (imgId !== null) {
+        if (!/^[a-f0-9-]{36}$/.test(imgId)) return send(404, { error: 'not_found' });
+        const data = await redis(['GET', IMG + imgId]);
+        const m = data && /^data:(image\/(?:jpeg|png|webp));base64,(.+)$/.exec(data);
+        if (!m) return send(404, { error: 'not_found' });
+        res.setHeader('Content-Type', m[1]);
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        return res.status(200).end(Buffer.from(m[2], 'base64'));
+      }
+      const rows = await redis(['LRANGE', KEY, 0, MAX_SHOWN - 1]);
+      const posts = (rows || [])
+        .map((s) => { try { return JSON.parse(s); } catch { return null; } })
+        .filter(Boolean);
+      return send(200, { posts });
     }
 
-    if (req.method === 'POST') {
-      res.setHeader('Cache-Control', 'no-store');
-      if (!process.env.ADMIN_PASSWORD) return res.status(500).json({ error: 'admin_not_configured' });
-      if (!isOwner(req)) {
-        await new Promise((r) => setTimeout(r, 700)); // slow down password guessing
-        return res.status(401).json({ error: 'unauthorized' });
-      }
-      let b = req.body;
-      if (typeof b === 'string') { try { b = JSON.parse(b); } catch (e) { b = {}; } }
-      b = b || {};
-
-      if (b.op === 'check') return res.status(200).json({ ok: true });
-
-      if (b.op === 'create') {
-        const text = String(b.text || '').trim().slice(0, 2000);
-        const image = String(b.image || '').trim();
-        if (!text && !image) return res.status(400).json({ error: 'empty' });
-        if (image && !/^https:\/\/\S{1,500}$/.test(image)) return res.status(400).json({ error: 'bad_image' });
-        const post = {
-          id: Date.now().toString(36) + crypto.randomBytes(3).toString('hex'),
-          text, image, at: new Date().toISOString(),
-        };
-        const posts = await loadPosts();
-        posts.unshift(post);
-        await savePosts(posts.slice(0, 200));
-        return res.status(200).json({ post });
-      }
-
-      if (b.op === 'delete') {
-        const posts = await loadPosts();
-        await savePosts(posts.filter((p) => p.id !== String(b.id)));
-        return res.status(200).json({ ok: true });
-      }
-
-      return res.status(400).json({ error: 'bad_request' });
+    if (req.method !== 'POST') {
+      res.setHeader('Allow', 'GET, POST');
+      return send(405, { error: 'method_not_allowed' });
     }
 
-    res.setHeader('Allow', 'GET, POST');
-    return res.status(405).json({ error: 'method_not_allowed' });
+    // ---------- owner only below ----------
+    const admin = process.env.ADMIN_PASSWORD;
+    if (!admin) return send(500, { error: 'admin_not_configured' });
+
+    // brute-force guard: 8 wrong passwords per IP, then locked for 15 minutes
+    const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+    const failKey = 'voulge:fail:' + ip;
+    if ((+(await redis(['GET', failKey])) || 0) >= 8) return send(429, { error: 'too_many_attempts' });
+
+    const pass = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
+    if (!pass || !sameSecret(pass, admin)) {
+      const n = await redis(['INCR', failKey]);
+      if (n === 1) await redis(['EXPIRE', failKey, 900]);
+      return send(401, { error: 'unauthorized' });
+    }
+
+    let body = req.body;
+    if (typeof body === 'string') { try { body = JSON.parse(body); } catch { body = {}; } }
+    body = body || {};
+
+    if (body.op === 'check') return send(200, { ok: true });
+
+    if (body.op === 'create') {
+      const text = String(body.text || '').trim().slice(0, 2000);
+      const imageData = String(body.imageData || '');
+      let image = '';
+      if (imageData) {
+        if (imageData.length > MAX_IMG_CHARS) return send(413, { error: 'image_too_large' });
+        if (!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/.test(imageData)) return send(400, { error: 'bad_image' });
+      } else if (body.image) {
+        image = String(body.image).trim();
+        if (!/^https:\/\/\S+$/.test(image) || image.length > 500) return send(400, { error: 'bad_image' });
+      }
+      if (!text && !image && !imageData) return send(400, { error: 'empty' });
+
+      const id = crypto.randomUUID();
+      if (imageData) {
+        await redis(['SET', IMG + id, imageData]);
+        image = '/api/posts?img=' + id;
+      }
+      const post = { id, text, image, at: new Date().toISOString() };
+      await redis(['LPUSH', KEY, JSON.stringify(post)]);
+      if ((await redis(['LLEN', KEY])) > MAX_POSTS) await dropImage(await redis(['RPOP', KEY]));
+      return send(200, { post });
+    }
+
+    if (body.op === 'delete') {
+      const id = String(body.id || '');
+      const rows = (await redis(['LRANGE', KEY, 0, -1])) || [];
+      const row = rows.find((s) => { try { return JSON.parse(s).id === id; } catch { return false; } });
+      if (!row) return send(404, { error: 'not_found' });
+      await redis(['LREM', KEY, 1, row]);
+      await dropImage(row);
+      return send(200, { ok: true });
+    }
+
+    return send(400, { error: 'bad_op' });
   } catch (e) {
-    console.error(e);
-    return res.status(500).json({ error: 'server_error' });
+    console.error('posts api error:', e.message);
+    return send(500, { error: 'server_error' });
   }
 };
