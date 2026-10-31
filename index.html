@@ -255,6 +255,8 @@ form{padding:30px;border:1px solid transparent;border-radius:26px;background:lin
 .cp-sk{height:120px;border-radius:24px;border:1px solid var(--line);background:linear-gradient(100deg,var(--card) 30%,var(--soft) 50%,var(--card) 70%);background-size:200% 100%;animation:cmsk 1.4s linear infinite}
 @keyframes cmsk{to{background-position:-200% 0}}
 .cm-empty{padding:44px 24px;border:1px dashed var(--line);border-radius:24px;text-align:center;color:var(--muted)}
+.cm-pv{display:flex;align-items:center;gap:14px;margin-top:12px}
+.cm-pv img{height:84px;max-width:160px;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
 .cm-nav{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:22px}
 .cm-arr{width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:1.2rem;cursor:pointer;transition:all .2s}
 .cm-arr:hover:not(:disabled){border-color:var(--p2);box-shadow:0 0 24px var(--glow);transform:translateY(-2px)}
@@ -345,7 +347,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
     <div class="cm-own" id="cm-own">
       <div class="cm-top"><span class="cm-av" style="width:36px;height:36px"></span><span>Posting as <b>Voulge</b></span><button class="own-btn" id="cm-out" type="button" style="margin-left:auto">Sign out</button></div>
       <textarea class="cm-ta" id="cm-t" maxlength="2000" placeholder="What&rsquo;s on your mind?"></textarea>
-      <div class="cm-row"><input class="cm-in" id="cm-img" type="url" placeholder="Image link (optional, https://&hellip;)" autocomplete="off"><span class="cm-n" id="cm-n">0 / 2000</span></div>
+      <div class="cm-row"><input id="cm-file" type="file" accept="image/*" hidden><button class="btn btn-g" id="cm-pick" type="button">Add image</button><span class="cm-n" id="cm-n">0 / 2000</span></div>
+      <div class="cm-pv" id="cm-pv" style="display:none"><img id="cm-pimg" alt=""><button type="button" class="own-btn" id="cm-prm">Remove image</button></div>
       <div class="cm-row"><button class="btn btn-p" id="cm-post" type="button">Post</button><span class="cm-s" id="cm-s"></span></div>
     </div>
     <div class="cm-feed" id="cm-feed"></div>
@@ -630,7 +633,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
   $('[data-soc]').forEach(function(a){var t=a.dataset.soc,y=YOUTUBE_URL.replace(/\/$/,''),u=t==='discord'?DISCORD_URL:t==='shorts'?(y?y+'/shorts':''):YOUTUBE_URL;if(u){a.href=u;a.target='_blank';a.rel='noopener'}});
 
   // ================= Posts (owner-only community feed) =================
-  var cmFeed=byId('cm-feed'),cmTa=byId('cm-t'),cmImg=byId('cm-img');
+  var cmFeed=byId('cm-feed'),cmTa=byId('cm-t'),cmFile=byId('cm-file'),cmPv=byId('cm-pv'),cmPimg=byId('cm-pimg'),imgData='';
   var cmCnt=byId('cm-n'),cmSay=byId('cm-s'),cmPost=byId('cm-post');
   var cmMd=byId('cm-md'),cmPw=byId('cm-pw'),cmMs=byId('cm-ms'),cmLb=byId('cm-lb'),ownBtn=byId('own');
   var posts=[],ownPw='',idx=0,sx=0;
@@ -664,7 +667,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
     if(p.st)dl.remove();else dl.addEventListener('click',function(){delPost(p.id,a)});
     a.appendChild(h);
     if(p.text){var t=document.createElement('p');t.className='cp-t';linkify(t,p.text);a.appendChild(t)}
-    if(p.image&&/^https:\/\//.test(p.image)){
+    if(p.image&&(/^https:\/\//.test(p.image)||/^\/api\/posts\?img=[a-f0-9-]+$/.test(p.image))){
       var im=new Image();im.className='cp-i';im.loading='lazy';im.alt='';im.referrerPolicy='no-referrer';
       im.onerror=function(){im.remove()};
       im.addEventListener('click',function(){openLb(p.image)});
@@ -746,16 +749,51 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
   function countChars(){cmCnt.textContent=cmTa.value.length+' / 2000'}
   cmTa.addEventListener('input',countChars);
   cmTa.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='Enter')cmPost.click()});
+  // ---- image upload: shrink in the browser, then send with the post ----
+  function shrink(file){
+    return new Promise(function(res,rej){
+      if(!/^image\//.test(file.type))return rej(new Error('type'));
+      var u=URL.createObjectURL(file),im=new Image();
+      im.onload=function(){
+        URL.revokeObjectURL(u);
+        var sc=Math.min(1,1600/Math.max(im.width,im.height)),q=.85,out='';
+        for(var i=0;i<8;i++){
+          var c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.width*sc));c.height=Math.max(1,Math.round(im.height*sc));
+          var g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(im,0,0,c.width,c.height);
+          out=c.toDataURL('image/jpeg',q);
+          if(out.length<=680000)return res(out);
+          q=Math.max(.5,q-.1);sc*=.85;
+        }
+        rej(new Error('big'));
+      };
+      im.onerror=function(){URL.revokeObjectURL(u);rej(new Error('read'))};
+      im.src=u;
+    });
+  }
+  function clearImg(){imgData='';cmFile.value='';cmPimg.removeAttribute('src');cmPv.style.display='none'}
+  function setImg(file){
+    if(!file)return;
+    cmSay.textContent='Preparing image\u2026';
+    shrink(file).then(function(d){imgData=d;cmPimg.src=d;cmPv.style.display='flex';cmSay.textContent=''})
+      .catch(function(){clearImg();cmSay.textContent='Couldn\u2019t use that image. Try a different one.'});
+  }
+  byId('cm-pick').addEventListener('click',function(){cmFile.click()});
+  cmFile.addEventListener('change',function(){setImg(cmFile.files[0])});
+  byId('cm-prm').addEventListener('click',clearImg);
+  cmTa.addEventListener('paste',function(e){
+    var it=[].slice.call((e.clipboardData&&e.clipboardData.items)||[]).filter(function(x){return x.kind==='file'&&/^image\//.test(x.type)})[0];
+    if(it){e.preventDefault();setImg(it.getAsFile())}
+  });
   cmPost.addEventListener('click',function(){
-    var t=cmTa.value.trim(),im=cmImg.value.trim();
-    if(!t&&!im){cmSay.textContent='Write something first.';return}
-    if(im&&!/^https:\/\/\S+$/.test(im)){cmSay.textContent='Image link must start with https://';return}
+    var t=cmTa.value.trim();
+    if(!t&&!imgData){cmSay.textContent='Write something or add an image first.';return}
     cmPost.disabled=true;cmSay.textContent='Posting\u2026';
-    postApi({op:'create',text:t,image:im},ownPw).then(function(j){
+    postApi({op:'create',text:t,imageData:imgData},ownPw).then(function(j){
       posts.unshift(j.post);idx=0;renderPosts();
-      cmTa.value='';cmImg.value='';countChars();cmSay.textContent='Posted!';
+      cmTa.value='';clearImg();countChars();cmSay.textContent='Posted!';
     }).catch(function(e){
       if(e.status===401){signOut();cmSay.textContent='Session expired. Sign in again.'}
+      else if(e.code==='image_too_large'||e.status===413)cmSay.textContent='That image is too big. Try a smaller one.';
       else cmSay.textContent='Couldn\u2019t post. Try again.';
     }).then(function(){cmPost.disabled=false});
   });
