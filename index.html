@@ -79,11 +79,14 @@ header{position:fixed;top:0;left:0;right:0;z-index:50;padding-top:env(safe-area-
 .btn-p:hover{filter:brightness(1.12);box-shadow:0 0 0 1px rgba(255,255,255,.3) inset,0 16px 56px -8px rgba(160,160,160,.7)}
 .btn-g{border:1px solid var(--line);background:var(--soft);color:var(--text)}
 .btn-g:hover{border-color:var(--p)}
+.btn-d{background:linear-gradient(#c0504d,#8a2c2a);color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.18) inset,0 12px 40px -12px rgba(200,70,70,.6)}
+.btn-d:hover{filter:brightness(1.12)}
 @keyframes fade{from{opacity:0;transform:translateY(18px)}}
 @keyframes up{from{transform:translateY(115%)}}
 @keyframes bob{50%{transform:translateY(-10px)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes tw{50%{opacity:.15;transform:scale(.5)}}
+@keyframes pop{from{opacity:0;transform:scale(.9) translateY(14px)}}
 /* reveal variants */
 .rv{opacity:0;transform:translateY(46px);transition:opacity .9s cubic-bezier(.2,.8,.2,1),transform .9s cubic-bezier(.2,.8,.2,1),filter .9s;transition-delay:var(--d,0s)}
 .rv[data-a="left"]{transform:translateX(-70px)}.rv[data-a="right"]{transform:translateX(70px)}
@@ -252,9 +255,14 @@ form{padding:30px;border:1px solid transparent;border-radius:26px;background:lin
 .cp-sk{height:120px;border-radius:24px;border:1px solid var(--line);background:linear-gradient(100deg,var(--card) 30%,var(--soft) 50%,var(--card) 70%);background-size:200% 100%;animation:cmsk 1.4s linear infinite}
 @keyframes cmsk{to{background-position:-200% 0}}
 .cm-empty{padding:44px 24px;border:1px dashed var(--line);border-radius:24px;text-align:center;color:var(--muted)}
-.cm-more{margin-top:18px}
+.cm-nav{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:22px}
+.cm-arr{width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:1.2rem;cursor:pointer;transition:all .2s}
+.cm-arr:hover:not(:disabled){border-color:var(--p2);box-shadow:0 0 24px var(--glow);transform:translateY(-2px)}
+.cm-arr:disabled{opacity:.3;cursor:default}
+.cm-cnt{min-width:70px;text-align:center;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .cm-md{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .cm-md.on{display:flex;animation:fade .3s both}
+.cm-md.on .cm-card{animation:pop .35s cubic-bezier(.2,.8,.2,1)}
 .cm-card{width:min(380px,100%);padding:26px;border:1px solid var(--line);border-radius:24px;background:var(--card)}
 .cm-card h3{margin:0 0 6px;font-size:1.2rem;letter-spacing:-.03em}.cm-card p{margin:0 0 16px;color:var(--muted);font-size:.86rem}
 .cm-lb{cursor:zoom-out;padding:24px}.cm-lb img{max-width:100%;max-height:100%;border-radius:14px;box-shadow:0 40px 120px rgba(0,0,0,.6)}
@@ -341,7 +349,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
       <div class="cm-row"><button class="btn btn-p" id="cm-post" type="button">Post</button><span class="cm-s" id="cm-s"></span></div>
     </div>
     <div class="cm-feed" id="cm-feed"></div>
-    <button class="btn btn-g cm-more" id="cm-more" type="button" style="display:none">Show more</button>
+    <div class="cm-nav" id="cm-nav" style="display:none"><button type="button" class="cm-arr" id="cm-prev" aria-label="Newer post" title="Newer">&#8592;</button><span class="cm-cnt" id="cm-cnt"></span><button type="button" class="cm-arr" id="cm-next" aria-label="Older post" title="Older">&#8594;</button></div>
   </div>
 </div></section>
 
@@ -408,6 +416,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
   <input class="cm-in" id="cm-pw" type="password" placeholder="Password" autocomplete="current-password">
   <div class="cm-row"><button class="btn btn-p" id="cm-go" type="button">Sign in</button><span class="cm-s" id="cm-ms"></span></div></div></div>
 <div class="cm-md cm-lb" id="cm-lb"><img alt=""></div>
+<div class="cm-md" id="dlg"><div class="cm-card"><h3 id="dlg-t"></h3><p id="dlg-p"></p><div class="cm-row"><button class="btn btn-p" id="dlg-ok" type="button">OK</button><button class="btn btn-g" id="dlg-no" type="button">Cancel</button></div></div></div>
 
 <script>
 (function(){
@@ -621,10 +630,10 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
   $('[data-soc]').forEach(function(a){var t=a.dataset.soc,y=YOUTUBE_URL.replace(/\/$/,''),u=t==='discord'?DISCORD_URL:t==='shorts'?(y?y+'/shorts':''):YOUTUBE_URL;if(u){a.href=u;a.target='_blank';a.rel='noopener'}});
 
   // ================= Posts (owner-only community feed) =================
-  var cmFeed=byId('cm-feed'),cmMore=byId('cm-more'),cmTa=byId('cm-t'),cmImg=byId('cm-img');
+  var cmFeed=byId('cm-feed'),cmTa=byId('cm-t'),cmImg=byId('cm-img');
   var cmCnt=byId('cm-n'),cmSay=byId('cm-s'),cmPost=byId('cm-post');
   var cmMd=byId('cm-md'),cmPw=byId('cm-pw'),cmMs=byId('cm-ms'),cmLb=byId('cm-lb'),ownBtn=byId('own');
-  var posts=[],shown=6,ownPw='';
+  var posts=[],ownPw='',idx=0,sx=0;
   try{ownPw=sessionStorage.getItem('own_pw')||''}catch(e){}
   function ago(iso){
     var dt=new Date(iso),sec=(Date.now()-dt)/1000;
@@ -648,8 +657,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
   function card(p){
     var a=document.createElement('article');a.className='cp';
     var h=document.createElement('div');h.className='cp-h';
-    h.innerHTML='<span class="cm-av"></span><div><b>Voulge</b><span></span></div><button type="button" class="own-btn cp-d">Delete</button>';
-    var tm=h.querySelector('div span');tm.textContent=ago(p.at);
+    h.innerHTML='<span class="cm-av"></span><div><b>Voulge</b><span class="cp-tm"></span></div><button type="button" class="own-btn cp-d">Delete</button>';
+    var tm=h.querySelector('.cp-tm');tm.textContent=ago(p.at);
     try{tm.title=new Date(p.at).toLocaleString()}catch(e){}
     var dl=h.querySelector('.cp-d');
     if(p.st)dl.remove();else dl.addEventListener('click',function(){delPost(p.id,a)});
@@ -663,36 +672,35 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
     }
     return a;
   }
-  var pio='IntersectionObserver' in window?new IntersectionObserver(function(es){
-    es.forEach(function(e){
-      if(!e.isIntersecting)return;
-      var el=e.target,i=+el.dataset.i||0;
-      setTimeout(function(){el.classList.add('show')},i*90);
-      pio.unobserve(el);
-    });
-  },{threshold:.1}):null;
-  function revealPosts(){
-    $('.cp:not(.show)',cmFeed).forEach(function(el,i){
-      el.dataset.i=i%6;
-      if(rm||!pio)el.classList.add('show');else pio.observe(el);
-    });
-  }
+  // one post at a time, with arrows (newest first)
   function renderPosts(){
+    var nav=byId('cm-nav'),c;
     cmFeed.innerHTML='';
     if(!posts.length){
-      var e=document.createElement('div');e.className='cm-empty';e.textContent='No posts yet. Check back soon.';
-      cmFeed.appendChild(e);cmMore.style.display='none';return;
+      c=document.createElement('div');c.className='cm-empty';c.textContent='No posts yet. Check back soon.';
+      cmFeed.appendChild(c);nav.style.display='none';return;
     }
-    posts.slice(0,shown).forEach(function(p){cmFeed.appendChild(card(p))});
-    cmMore.style.display=posts.length>shown?'':'none';
-    revealPosts();
+    idx=Math.max(0,Math.min(posts.length-1,idx));
+    c=card(posts[idx]);cmFeed.appendChild(c);
+    if(rm)c.classList.add('show');else setTimeout(function(){c.classList.add('show')},20);
+    nav.style.display=posts.length>1?'':'none';
+    byId('cm-cnt').textContent=(idx+1)+' / '+posts.length;
+    byId('cm-prev').disabled=idx===0;
+    byId('cm-next').disabled=idx===posts.length-1;
   }
-  cmMore.addEventListener('click',function(){
-    posts.slice(shown,shown+6).forEach(function(p){cmFeed.appendChild(card(p))});
-    shown+=6;cmMore.style.display=posts.length>shown?'':'none';revealPosts();
+  function stepPost(d){var n=idx+d;if(n>=0&&n<posts.length){idx=n;renderPosts()}}
+  byId('cm-prev').addEventListener('click',function(){stepPost(-1)});
+  byId('cm-next').addEventListener('click',function(){stepPost(1)});
+  cmFeed.addEventListener('touchstart',function(e){sx=e.touches[0].clientX},{passive:true});
+  cmFeed.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>60)stepPost(dx<0?1:-1)});
+  addEventListener('keydown',function(e){
+    if(/INPUT|TEXTAREA|SELECT/.test((e.target&&e.target.tagName)||''))return;
+    var r=byId('posts').getBoundingClientRect();
+    if(r.top>innerHeight*.6||r.bottom<innerHeight*.4)return;
+    if(e.key==='ArrowLeft')stepPost(-1);else if(e.key==='ArrowRight')stepPost(1);
   });
   function loadPosts(){
-    cmFeed.innerHTML='<div class="cp-sk"></div><div class="cp-sk"></div>';
+    cmFeed.innerHTML='<div class="cp-sk"></div>';
     return fetch(POSTS_API,{headers:{Accept:'application/json'}})
       .then(function(r){if(!r.ok)throw 0;return r.json()})
       .then(function(j){if(!j||!Array.isArray(j.posts))throw 0;posts=j.posts})
@@ -700,7 +708,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
         posts=STATIC_POSTS.map(function(p){return{id:'',text:p.text||'',image:p.image||'',at:p.at||new Date().toISOString(),st:1}})
           .sort(function(a,b){return new Date(b.at)-new Date(a.at)});
       })
-      .then(renderPosts);
+      .then(function(){idx=0;renderPosts()});
   }
   function postApi(body,pass){
     return fetch(POSTS_API,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+pass},body:JSON.stringify(body)})
@@ -744,22 +752,38 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--p2);outline-offset:
     if(im&&!/^https:\/\/\S+$/.test(im)){cmSay.textContent='Image link must start with https://';return}
     cmPost.disabled=true;cmSay.textContent='Posting\u2026';
     postApi({op:'create',text:t,image:im},ownPw).then(function(j){
-      posts.unshift(j.post);
-      var em=cmFeed.querySelector('.cm-empty');if(em)em.remove();
-      cmFeed.insertBefore(card(j.post),cmFeed.firstChild);revealPosts();
+      posts.unshift(j.post);idx=0;renderPosts();
       cmTa.value='';cmImg.value='';countChars();cmSay.textContent='Posted!';
     }).catch(function(e){
       if(e.status===401){signOut();cmSay.textContent='Session expired. Sign in again.'}
       else cmSay.textContent='Couldn\u2019t post. Try again.';
     }).then(function(){cmPost.disabled=false});
   });
+  // site-styled confirm / message box (replaces the browser popup)
+  function ask(title,text,ok,cancel,danger){
+    return new Promise(function(done){
+      var m=byId('dlg'),b=byId('dlg-ok'),n=byId('dlg-no'),pr=document.activeElement;
+      byId('dlg-t').textContent=title;byId('dlg-p').textContent=text;
+      b.textContent=ok||'OK';b.className='btn '+(danger?'btn-d':'btn-p');
+      n.style.display=cancel===false?'none':'';n.textContent=cancel||'Cancel';
+      m.classList.add('on');b.focus();
+      function end(v){m.classList.remove('on');b.onclick=n.onclick=m.onclick=null;removeEventListener('keydown',key,true);if(pr&&pr.focus)pr.focus();done(v)}
+      function key(e){if(e.key==='Escape'){e.stopPropagation();end(false)}else if(e.key==='Enter'){e.preventDefault();end(true)}}
+      b.onclick=function(){end(true)};n.onclick=function(){end(false)};
+      m.onclick=function(e){if(e.target===m)end(false)};
+      addEventListener('keydown',key,true);
+    });
+  }
   function delPost(id,el){
-    if(!id||!confirm('Delete this post?'))return;
-    postApi({op:'delete',id:id},ownPw).then(function(){
-      posts=posts.filter(function(p){return p.id!==id});
-      el.style.opacity='0';el.style.transform='scale(.96)';
-      setTimeout(function(){el.remove();if(!cmFeed.children.length)renderPosts()},400);
-    }).catch(function(){alert('Couldn\u2019t delete. Try again.')});
+    if(!id)return;
+    ask('Delete this post?','This can\u2019t be undone.','Delete','Cancel',true).then(function(yes){
+      if(!yes)return;
+      postApi({op:'delete',id:id},ownPw).then(function(){
+        posts=posts.filter(function(p){return p.id!==id});
+        el.style.opacity='0';el.style.transform='scale(.96)';
+        setTimeout(function(){renderPosts()},400);
+      }).catch(function(){ask('Couldn\u2019t delete','Please try again.','OK',false)});
+    });
   }
   loadPosts();
 
