@@ -543,28 +543,20 @@
   // ---- custom cursor ----
   if(!rm&&hov&&matchMedia('(pointer:fine)').matches){
     root.classList.add('cc');
-    var ccd=document.createElement('div'),ccr=document.createElement('div'),ccl=document.createElement('span');
-    ccd.className='ccd';ccr.className='ccr';ccr.appendChild(ccl);document.body.appendChild(ccr);document.body.appendChild(ccd);
-    var H=root.classList,cx3=0,cy3=0,tx3=0,ty3=0,first=true;
+    var ccd=document.createElement('div');
+    ccd.className='ccd';document.body.appendChild(ccd);
+    var H=root.classList;
     function ccState(t){
-      var lbl='',link=false,txt=false;
+      var link=false,txt=false;
       if(t&&t.closest){
         if(t.closest('input,textarea,select'))txt=true;
-        else if(t.closest('#intro')){if(H.contains('ready')&&!H.contains('go'))lbl='Enter'}
-        else if(t.closest('.cm-lb'))lbl='Close';
-        else if(t.closest('.cp-i'))lbl='View';
-        else if(t.closest('.vc'))lbl='Watch';
-        else if(t.closest('.soc'))lbl='Open';
         else if(t.closest('a,button,[data-go]'))link=true;
       }
-      H.toggle('cc-txt',txt);H.toggle('cc-lbl',!!lbl);H.toggle('cc-link',link);
-      if(lbl&&ccl.textContent!==lbl)ccl.textContent=lbl;
+      H.toggle('cc-txt',txt);H.toggle('cc-link',link);
     }
     addEventListener('pointermove',function(e){
-      tx3=e.clientX;ty3=e.clientY;
-      if(first){cx3=tx3;cy3=ty3;first=false}
       H.add('cc-on');ccState(e.target);
-      ccd.style.transform='translate('+tx3+'px,'+ty3+'px)';
+      ccd.style.transform='translate('+e.clientX+'px,'+e.clientY+'px)';
     },{passive:true});
     document.addEventListener('mouseleave',function(){H.remove('cc-on')});
     document.addEventListener('mouseenter',function(){H.add('cc-on')});
@@ -574,6 +566,5 @@
       var r=document.createElement('div');r.className='ccp';r.style.left=e.clientX+'px';r.style.top=e.clientY+'px';
       document.body.appendChild(r);setTimeout(function(){r.remove()},800);
     });
-    (function lp(){cx3+=(tx3-cx3)*.17;cy3+=(ty3-cy3)*.17;ccr.style.transform='translate('+cx3.toFixed(1)+'px,'+cy3.toFixed(1)+'px)';requestAnimationFrame(lp)})();
   }
 })();
