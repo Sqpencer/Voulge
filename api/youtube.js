@@ -39,26 +39,31 @@ export default async function handler(req, res) {
     }
     const c = ch.items[0];
 
-    // latest uploads
+    // latest uploads (a channel with no videos has no readable uploads playlist)
     let v = [];
     const uploads = c.contentDetails && c.contentDetails.relatedPlaylists && c.contentDetails.relatedPlaylists.uploads;
     if (uploads) {
-      const pl = await yt('playlistItems', { part: 'contentDetails', playlistId: uploads, maxResults: 12 }, key);
-      const ids = (pl.items || []).map(i => i.contentDetails.videoId).filter(Boolean);
-      if (ids.length) {
-        const vs = await yt('videos', { part: 'snippet,statistics', id: ids.join(',') }, key);
-        v = (vs.items || []).map(x => {
-          const th = x.snippet.thumbnails || {};
-          return {
-            id: x.id,
-            t: x.snippet.title,
-            th: (th.maxres || th.standard || th.high || th.medium || th.default || {}).url || '',
-            views: +(x.statistics.viewCount || 0),
-            likes: +(x.statistics.likeCount || 0),
-            com: +(x.statistics.commentCount || 0),
-            at: x.snippet.publishedAt
-          };
-        });
+      try {
+        const pl = await yt('playlistItems', { part: 'contentDetails', playlistId: uploads, maxResults: 12 }, key);
+        const ids = (pl.items || []).map(i => i.contentDetails.videoId).filter(Boolean);
+        if (ids.length) {
+          const vs = await yt('videos', { part: 'snippet,statistics', id: ids.join(',') }, key);
+          v = (vs.items || []).map(x => {
+            const th = x.snippet.thumbnails || {};
+            return {
+              id: x.id,
+              t: x.snippet.title,
+              th: (th.maxres || th.standard || th.high || th.medium || th.default || {}).url || '',
+              views: +(x.statistics.viewCount || 0),
+              likes: +(x.statistics.likeCount || 0),
+              com: +(x.statistics.commentCount || 0),
+              at: x.snippet.publishedAt
+            };
+          });
+        }
+      } catch (e) {
+        if (e.status !== 404) throw e; // only ignore "no uploads yet"
+        v = [];
       }
     }
 
