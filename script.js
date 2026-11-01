@@ -25,7 +25,7 @@
   var YT_HANDLE="@Voulge";
   var YOUTUBE_URL="https://www.youtube.com/@Voulge";
   var DISCORD_URL="https://discord.gg/CkDYG5kFyK";
-  var PFP_URL="https://i.imgur.com/8Pq3GWh.jpeg";
+  var PFP_URL="https://i.imgur.com/5Ui1DtA.png";
   var ABOUT_PHOTO_URL="https://i.imgur.com/UA6CNMK.png";
   var BANNER_URL="https://i.imgur.com/RYqcCav.png";
   var DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/1565175240445923429/wqEuc7zNtvDxQxM_xpN9lSb_I2OhGqEd-Qm_2MWdBbrf0VWb6MoAly9NBOv_tXNtGxw7";
