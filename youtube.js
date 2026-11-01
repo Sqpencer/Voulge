@@ -4,7 +4,7 @@
 
 const DEFAULT_CHANNEL_ID = 'UClC8ramdKXZXUwQqTjuDRzw';
 const DEFAULT_HANDLE = '@Voulge';
-const API = 'AIzaSyAWB2EWdQg147KeW37M-HAiPEa4XZ2tMgY';
+const API = 'AIzaSyATKHSG80iqoxX_INll-feDafGtSxbRGIk';
 
 async function yt(path, params, key) {
   const url = new URL(API + '/' + path);
