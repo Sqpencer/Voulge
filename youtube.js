@@ -21,7 +21,7 @@ async function yt(path, params, key) {
   return j;
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   const key = process.env.YOUTUBE_API_KEY;
   if (!key) {
     return res.status(500).json({ error: 'YOUTUBE_API_KEY is not set in Vercel environment variables' });
@@ -77,4 +77,4 @@ module.exports = async function handler(req, res) {
   } catch (e) {
     return res.status(e.status || 500).json({ error: e.message || 'youtube error' });
   }
-};
+}
