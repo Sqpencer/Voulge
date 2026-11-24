@@ -113,8 +113,12 @@ document.addEventListener('click',function(e){
   var id=a.getAttribute('href').slice(1);if(!id)return;
   var t=document.getElementById(id);if(!t)return;
   e.preventDefault();
-  if(id==='home')scrollTo({top:0,behavior:RM?'instant':'smooth'});
-  else t.scrollIntoView({behavior:RM?'instant':'smooth',block:'start'})});
+  var bh=RM?'instant':'smooth';
+  if(id==='home')scrollTo({top:0,behavior:bh});
+  else if(id==='videos'){ /* land on the videos heading, not the banner (offsetTop ignores the reveal animation's shift) */
+    var h=t.querySelector('.eb')||t,y=0,n=h;while(n){y+=n.offsetTop;n=n.offsetParent}
+    scrollTo({top:Math.max(0,y-100),behavior:bh})}
+  else t.scrollIntoView({behavior:bh,block:'start'})});
 /* magnetic buttons */
 $('.mag').forEach(function(b){
   b.addEventListener('mousemove',function(e){var r=b.getBoundingClientRect();b.style.transform='translate('+((e.clientX-r.left-r.width/2)*.25).toFixed(1)+'px,'+((e.clientY-r.top-r.height/2)*.35).toFixed(1)+'px)'});
@@ -133,13 +137,15 @@ function render(){
   grid.innerHTML=list.map(function(v,i){return '<div class="cw rv" style="--d:'+(i%3)+'"><a class="card tilt'+(v.short?' sh':'')+'" href="'+esc(v.url)+'" target="_blank" rel="noopener"><span class="rk">0'+(i+1)+'</span><div class="th">'+(v.img?'<img src="'+esc(v.img)+'" alt="" loading="lazy">':'')+'<span class="tp '+(v.short?'s">Short':'v">Video')+'</span><span class="pl2"></span>'+(v.dur?'<span class="du">'+v.dur+'</span>':'')+'</div><div class="cb"><span class="nt">'+esc(v.meta)+'</span><h3>'+esc(v.title)+'</h3><p>'+esc(v.desc)+'</p></div></a></div>'}).join('');
   $('.rv',grid).forEach(function(el){el.classList.add('dn');io.observe(el)});$('.tilt',grid).forEach(tilt)}
 function api(path,q){q.key=CFG.apiKey;return fetch('https://www.googleapis.com/youtube/v3/'+path+'?'+new URLSearchParams(q)).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error&&j.error.message||r.status);return j})})}
-function uploads(){if(CFG.channelId)return Promise.resolve(CFG.channelId.replace(/^UC/,'UU'));return api('channels',{part:'contentDetails',forHandle:CFG.handle}).then(function(j){if(!j.items||!j.items.length)throw new Error('channel not found');return j.items[0].contentDetails.relatedPlaylists.uploads})}
+function chan(){return api('channels',Object.assign({part:'statistics,contentDetails'},CFG.channelId?{id:CFG.channelId}:{forHandle:CFG.handle})).then(function(j){if(!j.items||!j.items.length)throw new Error('channel not found');return j.items[0]})}
+function setStat(id,v){var el=document.getElementById(id);if(!el)return;if(v==null||isNaN(v)){el.textContent='—';return}
+  if(RM){el.textContent=kf(v);return}var t0=performance.now();(function s(n){var p=Math.min(1,(n-t0)/1200);el.textContent=kf(Math.round(v*(1-Math.pow(1-p,3))));if(p<1)requestAnimationFrame(s)})(t0)}
 function load(){
   if(!CFG.apiKey||!(CFG.channelId||CFG.handle)){vids=PH;render();note.textContent='Preview mode: add your YouTube API key and channel ID in VOULGE_CONFIG (top of the script) to load real videos.';return}
   var max=Math.min(50,CFG.maxVideos||12),smax=CFG.shortMax||180;
-  uploads().then(function(pid){return api('playlistItems',{part:'snippet',playlistId:pid,maxResults:max})})
+  chan().then(function(c){var s=c.statistics||{};setStat('st1',s.hiddenSubscriberCount?null:+s.subscriberCount);setStat('st3',+s.viewCount);return api('playlistItems',{part:'snippet',playlistId:c.contentDetails.relatedPlaylists.uploads,maxResults:max})})
   .then(function(j){return api('videos',{part:'snippet,contentDetails,statistics',id:j.items.map(function(i){return i.snippet.resourceId.videoId}).join(',')})})
-  .then(function(j){vids=j.items.map(function(v){var t=v.snippet.thumbnails,b=t.maxres||t.high||t.medium||t.default,d=new Date(v.snippet.publishedAt),n=secs(v.contentDetails.duration),sh=n>0&&(n<=smax||/#shorts?\b/i.test(v.snippet.title+' '+(v.snippet.description||'')));return{title:v.snippet.title,desc:(v.snippet.description||v.snippet.channelTitle).replace(/\s+/g,' ').slice(0,90),meta:kf(v.statistics.viewCount||0)+' views · '+d.toLocaleDateString(undefined,{month:'short',year:'numeric'}),url:sh?'https://www.youtube.com/shorts/'+v.id:'https://www.youtube.com/watch?v='+v.id,img:b.url,dur:fmt(n),short:sh,views:+v.statistics.viewCount||0,t:+d}});note.textContent='';render()})
+  .then(function(j){vids=j.items.map(function(v){var t=v.snippet.thumbnails,b=t.maxres||t.high||t.medium||t.default,d=new Date(v.snippet.publishedAt),n=secs(v.contentDetails.duration),sh=n>0&&(n<=smax||/#shorts?\b/i.test(v.snippet.title+' '+(v.snippet.description||'')));return{title:v.snippet.title,desc:(v.snippet.description||v.snippet.channelTitle).replace(/\s+/g,' ').slice(0,90),meta:kf(v.statistics.viewCount||0)+' views · '+d.toLocaleDateString(undefined,{month:'short',year:'numeric'}),url:sh?'https://www.youtube.com/shorts/'+v.id:'https://www.youtube.com/watch?v='+v.id,img:b.url,dur:fmt(n),short:sh,views:+v.statistics.viewCount||0,t:+d}});note.textContent='';render();setStat('st2',vids.length?Math.round(vids.reduce(function(a,v){return a+v.views},0)/vids.length):null)})
   .catch(function(e){vids=PH;render();note.textContent='Could not load videos from YouTube ('+e.message+'). Showing placeholders.'})}
 $('.chip').forEach(function(ch){ch.addEventListener('click',function(){
   Array.prototype.forEach.call(ch.parentNode.children,function(c){c.classList.toggle('on',c===ch)});
