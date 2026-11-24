@@ -27,7 +27,8 @@ nav a:hover,nav a.on{color:var(--ink)}nav a.on::after,nav a:hover::after{transfo
 /* pages */
 .page{display:block}
 /* reveal */
-.rv{opacity:0;transition:opacity .35s ease-out,transform .45s cubic-bezier(.2,.7,.2,1);will-change:transform}
+.rv{transition:opacity .35s ease-out,transform .45s cubic-bezier(.2,.7,.2,1);will-change:transform}
+.js .rv{opacity:0}
 .rv.dn{transform:translateY(40px) skewY(1deg)}.rv.up{transform:translateY(-40px) skewY(-1deg)}
 .rv.in{opacity:1;transform:none;transition-delay:calc(var(--d,0)*.04s)}
 /* hero */
