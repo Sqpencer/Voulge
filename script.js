@@ -12,9 +12,9 @@ window.VOULGE_CONFIG={
   pfp:'https://i.imgur.com/EGyqxIA.png',      // home + about
   banner:'https://i.imgur.com/6BrcY8p.png',   // home hero
   pfpVoulge:'',                               // Voulge page pfp (empty = reuses pfp above)
-  pfpVoulg3:'https://i.imgur.com/Ibm57Y2.jpeg',                               // Voulg3 page pfp (empty = reuses pfp above)
-  bannerVoulge:'https://i.imgur.com/n2FUeC0.png',                            // Voulge page banner (empty = reuses banner above)
-  bannerVoulg3:'https://i.imgur.com/1izYxwh.png',                            // Voulg3 page banner (empty = reuses banner above)
+  pfpVoulg3:'https://i.imgur.com/Ibm57Y2.jpeg', // Voulg3 page pfp
+  bannerVoulge:'https://i.imgur.com/n2FUeC0.png', // Voulge page banner
+  bannerVoulg3:'https://i.imgur.com/1izYxwh.png', // Voulg3 page banner
   apiKey:'',channelId:'',handle:'',maxVideos:6
 };
 
@@ -98,6 +98,19 @@ function loop(){
   var cur=0;pgs.forEach(function(p,i){if(p.getBoundingClientRect().top<vh*.4)cur=i});links.forEach(function(a,i){a.classList.toggle('on',i===cur)});
   requestAnimationFrame(loop)}
 loop();
+/* keep the URL clean (no #about etc.) and always start at the top on refresh */
+if('scrollRestoration' in history)history.scrollRestoration='manual';
+if(location.hash)history.replaceState(null,'',location.pathname+location.search);
+function toTop(){scrollTo({top:0,left:0,behavior:'instant'})}
+toTop();addEventListener('load',function(){toTop();setTimeout(toTop,60)});
+addEventListener('pageshow',function(){if(location.hash)history.replaceState(null,'',location.pathname+location.search);toTop()});
+document.addEventListener('click',function(e){
+  var a=e.target.closest&&e.target.closest('a[href^="#"]');if(!a)return;
+  var id=a.getAttribute('href').slice(1);if(!id)return;
+  var t=document.getElementById(id);if(!t)return;
+  e.preventDefault();
+  if(id==='home')scrollTo({top:0,behavior:RM?'instant':'smooth'});
+  else t.scrollIntoView({behavior:RM?'instant':'smooth',block:'start'})});
 /* magnetic buttons */
 $('.mag').forEach(function(b){
   b.addEventListener('mousemove',function(e){var r=b.getBoundingClientRect();b.style.transform='translate('+((e.clientX-r.left-r.width/2)*.25).toFixed(1)+'px,'+((e.clientY-r.top-r.height/2)*.35).toFixed(1)+'px)'});
