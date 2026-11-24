@@ -12,9 +12,9 @@ window.VOULGE_CONFIG={
   pfp:'https://i.imgur.com/EGyqxIA.png',      // home + about
   banner:'https://i.imgur.com/6BrcY8p.png',   // home hero
   pfpVoulge:'',                               // Voulge page pfp (empty = reuses pfp above)
-  pfpVoulg3:'',                               // Voulg3 page pfp (empty = reuses pfp above)
-  bannerVoulge:'',                            // Voulge page banner (empty = reuses banner above)
-  bannerVoulg3:'',                            // Voulg3 page banner (empty = reuses banner above)
+  pfpVoulg3:'https://i.imgur.com/Ibm57Y2.jpeg',                               // Voulg3 page pfp (empty = reuses pfp above)
+  bannerVoulge:'https://i.imgur.com/n2FUeC0.png',                            // Voulge page banner (empty = reuses banner above)
+  bannerVoulg3:'https://i.imgur.com/1izYxwh.png',                            // Voulg3 page banner (empty = reuses banner above)
   apiKey:'',channelId:'',handle:'',maxVideos:6
 };
 
