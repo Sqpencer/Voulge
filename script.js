@@ -18,7 +18,7 @@ window.VOULGE_CONFIG={
   pfpVoulg3:'https://i.imgur.com/Ibm57Y2.jpeg', // Voulg3 page pfp
   bannerVoulge:'https://i.imgur.com/n2FUeC0.png', // Voulge page banner
   bannerVoulg3:'https://i.imgur.com/1izYxwh.png', // Voulg3 page banner
-  apiKey:'',channelId:'',handle:'',maxVideos:12,shortMax:180
+  apiKey:'',channelId:'',handle:'@Voulge',maxVideos:12,shortMax:180
 };
 
 (function(){
