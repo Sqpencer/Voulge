@@ -10,13 +10,13 @@
 <script>document.documentElement.className+=" js";setTimeout(function(){if(!window.VOULGE_READY)document.documentElement.className=document.documentElement.className.replace(" js","")},2500)</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap">
-<link rel="stylesheet" href="style.css?v=11">
+<link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
 <div id="glow"></div><div id="prog"></div>
 <header id="hd">
   <a class="logo" href="#home"><svg viewBox="0 0 14 28"><path d="M7 0 14 12 9 28H5L0 12Z" fill="#f4f5f6"/></svg>VOULGE</a>
-  <nav id="nv"><a href="#home">Home</a><a href="#about">About</a><a href="#videos">Videos</a><a href="#voulge">Voulge</a><a href="#voulg3">Voulg3</a><a href="#community">Community</a></nav>
+  <nav id="nv"><a href="#home">Home</a><a href="#about">About</a><a href="#videos">Videos</a><a href="#live">Live</a><a href="#voulge">Voulge</a><a href="#voulg3">Voulg3</a><a href="#community">Community</a></nav>
   <button class="mb" id="mn" aria-label="Menu"><i></i><i></i><i></i></button>
 </header>
 
@@ -46,6 +46,7 @@
     <div><b id="st2">—</b><span>Avg. views</span></div>
     <div><b id="st3">—</b><span>Total views</span></div>
   </div>
+  <div class="sl rv" style="--d:1"><a class="btn g mag" href="#live"><i class="ld"></i>Live Subscriber Count</a></div>
 </div>
 
 <section class="s"><div class="wrap">
@@ -89,7 +90,29 @@
 </div></section>
 </div>
 
-<!-- 4. VOULGE (main channel) -->
+<!-- 4. LIVE SUBSCRIBER COUNT -->
+<div class="page" id="live">
+<section class="s"><div class="wrap">
+  <div class="eb rv">Live</div>
+  <h2 class="rv" style="--d:1">Live subscriber count</h2>
+  <p class="lead rv" style="--d:2">Counts up on its own while you watch. Every milestone gets a celebration.</p>
+  <div class="lv rv" style="--d:3">
+    <div class="lvh"><i class="ld"></i>Live</div>
+    <div class="odo" id="odo" aria-live="polite"><span class="cm">—</span></div>
+    <div class="lvs">subscribers</div>
+    <div class="lvm"><span id="lvgain">+0 since you opened this page</span><span id="lvup">Waiting for data…</span></div>
+    <div class="lvp">
+      <div class="lvt"><span>Next milestone <b id="lvnext">—</b></span><span id="lvtogo"></span></div>
+      <div class="pb"><i id="lvbar"></i></div>
+    </div>
+  </div>
+  <div class="eb rv" style="margin-top:46px">Milestones</div>
+  <div class="ms rv" id="ms"></div>
+  <div class="btns rv" style="margin-top:28px"><button class="btn g mag" id="lvtest" type="button">Preview celebration</button></div>
+</div></section>
+</div>
+
+<!-- 5. VOULGE (main channel) -->
 <div class="page" id="voulge">
 <section class="s"><div class="wrap">
   <div class="chb rv" data-k="bannerVoulge"><img alt="Voulge channel banner"></div>
@@ -101,7 +124,7 @@
 </div></section>
 </div>
 
-<!-- 5. VOULG3 (second channel) -->
+<!-- 6. VOULG3 (second channel) -->
 <div class="page" id="voulg3">
 <section class="s"><div class="wrap">
   <div class="chb rv" data-k="bannerVoulg3"><img alt="Voulg3 channel banner"></div>
@@ -114,7 +137,7 @@
 </div></section>
 </div>
 
-<!-- 6. COMMUNITY -->
+<!-- 7. COMMUNITY -->
 <div class="page" id="community">
 <section class="s"><div class="wrap">
   <div class="eb rv">Community</div>
@@ -129,6 +152,11 @@
 
 <footer><div class="wrap"><span>© 2026 Voulge</span><span>Orion Drift creator</span></div></footer>
 
-<script src="script.js?v=11"></script>
+<div id="cel" role="dialog" aria-modal="true" aria-label="Milestone celebration">
+  <canvas id="celc"></canvas>
+  <div class="cb2"><small>Milestone reached</small><b id="celn">1,000</b><span>subscribers</span><p id="celm"></p><button class="btn" id="celx" type="button">Close</button></div>
+</div>
+
+<script src="script.js?v=12"></script>
 </body>
 </html>
