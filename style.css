@@ -143,7 +143,7 @@ h2{font:700 clamp(34px,5vw,56px)/1.1 var(--b);letter-spacing:-.01em;margin-botto
 .chb{position:relative;height:clamp(150px,26vw,300px);overflow:hidden;background:linear-gradient(135deg,#2a2018,#8a5c32 50%,#1a1c20);clip-path:polygon(0 0,100% 0,100% calc(100% - 28px),calc(100% - 28px) 100%,0 100%)}
 .chb::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.06) 0 2px,transparent 2px 70px)}
 .chb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
-.chb.on img{display:block}.chb.on::before{display:none}
+.chb.on img{display:block}.chb.lt img{filter:invert(1) hue-rotate(180deg)}.chb.on::before{display:none}
 .chb::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(6,6,7,.7))}
 .pfp.chp{margin:-68px 0 26px 28px;position:relative;z-index:3}
 /* voulg3 */
@@ -164,3 +164,17 @@ footer .wrap{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
   nav a{padding:14px 8px;font-size:12px}nav a::after{display:none}
   .two,.grid,.go{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.stats div{border-right:0;border-bottom:1px solid var(--line)}.cue{display:none}#glow{display:none}.pfp{width:120px;height:120px}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}h1 span,.hs,.cta,.rv{opacity:1!important;clip-path:none!important;transform:none!important}}
+
+/* fullscreen counter (/live) */
+.lv{position:relative}
+.fsb{position:absolute;top:14px;right:46px;width:40px;height:40px;display:grid;place-items:center;background:var(--bg3);color:var(--ink);border:0;cursor:pointer;box-shadow:inset 0 0 0 1px var(--line);transition:background .3s,color .3s;z-index:3}
+.fsb:hover{background:var(--br);color:#16110b}
+.fsb svg{width:20px;height:20px}.fsb .c{display:none}
+html.fs .fsb .e{display:none}html.fs .fsb .c{display:block}
+html.fs header,html.fs footer,html.fs #prog{display:none}
+html.fs .wrap>*:not(.lv){display:none}
+html.fs section.s{padding:0!important}
+html.fs .wrap{max-width:none;padding:0}
+html.fs .lv{min-height:100vh;display:flex;flex-direction:column;justify-content:center;clip-path:none;border-radius:0;padding:60px 6vw 40px}
+html.fs .fsb{right:20px}
+html.fs .odo{font-size:clamp(90px,24vw,460px)}
