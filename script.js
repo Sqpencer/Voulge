@@ -1,27 +1,4 @@
-/* ===== SETUP: fill these in (YouTube API lives here) =====
-   pfp       : profile picture link from Imgur. Leave '' to show a placeholder "V".
-   banner    : banner link from Imgur. Leave '' to show a placeholder gradient.
-               Use the direct image link, e.g. https://i.imgur.com/AbC123.png
-               (a plain https://imgur.com/AbC123 link also works; album links do not)
-   pfpVideos, bannerVideos, pfpVoulge, pfpVoulg3, bannerVoulge, bannerVoulg3 : optional. Give each channel page its own
-               profile picture / banner. Left out, they reuse pfp and banner above.
-   apiKey    : YouTube Data API v3 key (Google Cloud Console). Restrict it to your site's domain.
-   channelId : starts with UC...   OR   handle: '@yourhandle'
-   maxVideos : how many videos + shorts to load (max 50)
-   shortMax  : anything this many seconds or shorter counts as a Short (default 180)
-   liveEvery : seconds between live subscriber checks while the Live section is on screen (default 30)
-   celebrateOnLoad : true = a visitor sees the celebration for the latest milestone once */
-window.VOULGE_CONFIG={
-  pfp:'https://i.imgur.com/EGyqxIA.png',      // home + about
-  banner:'https://i.imgur.com/6BrcY8p.png',   // home hero
-  pfpVideos:'',                               // Videos page pfp (empty = reuses pfp above)
-  bannerVideos:'',                            // Videos page banner (empty = reuses banner above)
-  pfpVoulge:'',                               // Voulge page pfp (empty = reuses pfp above)
-  pfpVoulg3:'https://i.imgur.com/Ibm57Y2.jpeg', // Voulg3 page pfp
-  bannerVoulge:'https://i.imgur.com/n2FUeC0.png', // Voulge page banner
-  bannerVoulg3:'https://i.imgur.com/1izYxwh.png', // Voulg3 page banner
-  apiKey:'',channelId:'UClC8ramdKXZXUwQqTjuDRzw',handle:'@Voulge',maxVideos:12,shortMax:180,liveEvery:30,celebrateOnLoad:true
-};
+/* Settings (API key, channel, image links) now live in config.js, shared by the main page and the /live page. */
 
 (function(){
 var $=function(s,c){return [].slice.call((c||document).querySelectorAll(s))};
@@ -80,8 +57,8 @@ var cio=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isInt
   $('[data-count]',e.target).forEach(function(b){var to=+b.dataset.count,t0=performance.now();(function s(n){var p=Math.min(1,(n-t0)/1200);b.textContent=Math.round(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(s)})(t0)})})},{threshold:.5});
 cio.observe(document.getElementById('stats'));
 /* scrolling sections: the menu scrolls to each one */
-var names=['home','about','videos','live','voulge','voulg3','community'],links=$('#nv a'),nv=document.getElementById('nv'),pgs=names.map(function(n){return document.getElementById(n)});
-links.forEach(function(a){a.addEventListener('click',function(){nv.classList.remove('open')})});
+var names=['home','about','videos','voulge','voulg3','community'],links=$('#nv a[href^="#"]'),nv=document.getElementById('nv'),pgs=names.map(function(n){return document.getElementById(n)});
+$('#nv a').forEach(function(a){a.addEventListener('click',function(){nv.classList.remove('open')})});
 draw();
 document.getElementById('mn').addEventListener('click',function(){nv.classList.toggle('open')});
 /* motion */
@@ -145,7 +122,7 @@ function setStat(id,v){var el=document.getElementById(id);if(!el)return;if(v==nu
 function load(){
   if(!CFG.apiKey||!(CFG.channelId||CFG.handle)){vids=PH;render();note.textContent='Preview mode: add your YouTube API key and channel ID in VOULGE_CONFIG (top of the script) to load real videos.';return}
   var max=Math.min(50,CFG.maxVideos||12),smax=CFG.shortMax||180;
-  chan().then(function(c){var s=c.statistics||{};setStat('st1',s.hiddenSubscriberCount?null:+s.subscriberCount);setStat('st3',+s.viewCount);if(!s.hiddenSubscriberCount)liveCount(+s.subscriberCount);else liveHidden();return api('playlistItems',{part:'snippet',playlistId:c.contentDetails.relatedPlaylists.uploads,maxResults:max})})
+  chan().then(function(c){var s=c.statistics||{};setStat('st1',s.hiddenSubscriberCount?null:+s.subscriberCount);setStat('st3',+s.viewCount);return api('playlistItems',{part:'snippet',playlistId:c.contentDetails.relatedPlaylists.uploads,maxResults:max})})
   .then(function(j){return api('videos',{part:'snippet,contentDetails,statistics',id:j.items.map(function(i){return i.snippet.resourceId.videoId}).join(',')})})
   .then(function(j){vids=j.items.map(function(v){var t=v.snippet.thumbnails,b=t.maxres||t.high||t.medium||t.default,d=new Date(v.snippet.publishedAt),n=secs(v.contentDetails.duration),sh=n>0&&(n<=smax||/#shorts?\b/i.test(v.snippet.title+' '+(v.snippet.description||'')));return{title:v.snippet.title,desc:(v.snippet.description||v.snippet.channelTitle).replace(/\s+/g,' ').slice(0,90),meta:kf(v.statistics.viewCount||0)+' views · '+d.toLocaleDateString(undefined,{month:'short',year:'numeric'}),url:sh?'https://www.youtube.com/shorts/'+v.id:'https://www.youtube.com/watch?v='+v.id,img:b.url,dur:fmt(n),short:sh,views:+v.statistics.viewCount||0,t:+d}});note.textContent='';render();setStat('st2',vids.length?Math.round(vids.reduce(function(a,v){return a+v.views},0)/vids.length):null)})
   .catch(function(e){vids=PH;render();note.textContent='Could not load videos from YouTube ('+e.message+'). Showing placeholders.'})}
@@ -153,75 +130,5 @@ $('.chip').forEach(function(ch){ch.addEventListener('click',function(){
   Array.prototype.forEach.call(ch.parentNode.children,function(c){c.classList.toggle('on',c===ch)});
   if(ch.dataset.s)st.s=ch.dataset.s;if(ch.dataset.t)st.t=ch.dataset.t;render()})});
 load();
-/* ===== Live subscriber count + milestone celebrations ===== */
-var MS=[23,50,100,250,500,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,20000,30000,40000,50000,60000,70000,80000,90000,100000,500000,1000000,2000000,3000000,4000000,5000000,6000000,7000000,8000000,9000000,10000000,50000000,100000000];
-function msl(n){return n>=1e6?n/1e6+'M':n>=1e3?n/1e3+'K':String(n)}
-function com(n){return Number(n).toLocaleString('en-US')}
-var lv={n:null,start:0,digits:0,odo:document.getElementById('odo')},msEl=document.getElementById('ms');
-msEl.innerHTML=MS.map(function(m){return '<div class="m" data-m="'+m+'">'+msl(m)+'<small>subs</small></div>'}).join('');
-function odoSet(n){
-  var s=com(n),d=s.replace(/\D/g,''),el=lv.odo;
-  if(d.length!==lv.digits||!el.querySelector('.dg')){
-    lv.digits=d.length;el.innerHTML=s.split('').map(function(ch){return ch===','?'<span class="cm">,</span>':'<span class="dg"><span class="col" style="--d:0">'+'0123456789'.split('').map(function(x){return '<i>'+x+'</i>'}).join('')+'</span></span>'}).join('');
-    requestAnimationFrame(function(){requestAnimationFrame(function(){$('.col',el).forEach(function(c,i){c.style.setProperty('--d',d[i])})})})
-  }else $('.col',el).forEach(function(c,i){c.style.setProperty('--d',d[i])})}
-function liveUI(n){
-  odoSet(n);
-  var nx=MS.filter(function(m){return m>n})[0],pv=MS.filter(function(m){return m<=n}).pop()||0;
-  document.getElementById('lvnext').textContent=nx?com(nx):'All reached';
-  document.getElementById('lvtogo').textContent=nx?com(nx-n)+' to go':'';
-  document.getElementById('lvbar').style.width=(nx?Math.max(2,(n-pv)/(nx-pv)*100):100)+'%';
-  var g=n-lv.start;document.getElementById('lvgain').textContent=(g>=0?'+':'')+com(g)+' since you opened this page';
-  document.getElementById('lvup').textContent='Updated '+new Date().toLocaleTimeString();
-  $('.m',msEl).forEach(function(e){var v=+e.dataset.m;e.classList.toggle('on',v<=n);e.classList.toggle('nx',v===nx)})}
-function seenGet(){try{return+localStorage.getItem('voulgeCel')||0}catch(e){return 0}}
-function seenSet(m){try{localStorage.setItem('voulgeCel',m)}catch(e){}}
-function liveCount(n){
-  if(isNaN(n))return;
-  if(lv.n===null){lv.n=n;lv.start=n;liveUI(n);
-    var top=MS.filter(function(m){return m<=n}).pop();
-    if(top&&top>seenGet()&&CFG.celebrateOnLoad!==false){seenSet(top);setTimeout(function(){celebrate(top)},1500)}
-    return}
-  if(n===lv.n)return;
-  var old=lv.n;lv.n=n;liveUI(n);document.getElementById('st1').textContent=kf(n);
-  var hit=MS.filter(function(m){return old<m&&n>=m});
-  if(hit.length){var t=hit[hit.length-1];seenSet(Math.max(seenGet(),t));celebrate(t)}}
-function liveHidden(){document.getElementById('lvup').textContent='Subscriber count is hidden on YouTube.'}
-if(!CFG.apiKey)document.getElementById('lvup').textContent='Add your YouTube API key in script.js to start the live count.';
-/* poll only while the Live section is near the screen and the tab is visible (saves API quota) */
-var near=false;
-new IntersectionObserver(function(es){near=es[0].isIntersecting;if(near)poll()},{rootMargin:'100% 0px'}).observe(document.getElementById('live'));
-function poll(){if(!CFG.apiKey||!(CFG.channelId||CFG.handle)||document.hidden||!near||lv.n===null)return;
-  api('channels',Object.assign({part:'statistics'},CFG.channelId?{id:CFG.channelId}:{forHandle:CFG.handle})).then(function(j){var s=j.items&&j.items[0]&&j.items[0].statistics;if(s&&!s.hiddenSubscriberCount)liveCount(+s.subscriberCount)}).catch(function(){})}
-setInterval(poll,Math.max(5,CFG.liveEvery||30)*1000);
-/* celebration */
-var cel=document.getElementById('cel'),cc=document.getElementById('celc'),cctx=cc.getContext('2d'),parts=[],raf=0,closeT=0,tms=[];
-var COL=['#d1a06a','#f4f5f6','#c9ced4','#8a5c32','#ffd9a0','#ffffff'];
-function celebrate(m){
-  var tier=m>=1e6?3:m>=1e5?2:m>=1e3?1:0;
-  document.getElementById('celn').textContent=com(m);
-  document.getElementById('celm').textContent=['Every single one of you counts. Thank you!','The community keeps growing. Thank you all!','Six figures. Unreal. Thank you all!','Legendary. Thank you all so much!'][tier];
-  cel.classList.add('on');
-  if(!RM)confetti(tier);
-  clearTimeout(closeT);closeT=setTimeout(closeCel,9000+tier*3000)}
-function closeCel(){cel.classList.remove('on');cancelAnimationFrame(raf);parts=[];clearTimeout(closeT);tms.forEach(clearTimeout);tms=[]}
-function spawn(x,y,n,base,spread,speed,grav){for(var i=0;i<n;i++){var a=base+(Math.random()-.5)*spread,v=speed*(.5+Math.random()*.7);parts.push({x:x,y:y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,r:Math.random()*6.28,vr:(Math.random()-.5)*.35,s:5+Math.random()*9,c:COL[Math.random()*COL.length|0],g:grav||(.16+Math.random()*.1)})}}
-function confetti(tier){
-  cancelAnimationFrame(raf);tms.forEach(clearTimeout);tms=[];parts=[];
-  var W=cc.width=innerWidth,H=cc.height=innerHeight,N=[70,120,200,320][tier],sp=Math.min(22,W/45);
-  function cannons(){spawn(0,H,N,-Math.PI/3,.9,sp,0);spawn(W,H,N,-2*Math.PI/3,.9,sp,0)}
-  cannons();
-  for(var k=1;k<=tier+1;k++)tms.push(setTimeout(cannons,k*900));
-  if(tier>=1)for(var r=0;r<14+tier*8;r++)tms.push(setTimeout(function(){spawn(Math.random()*W,-20,6,Math.PI/2,.6,3,.08)},r*260));
-  if(tier>=2)for(var f=0;f<tier*3;f++)tms.push(setTimeout(function(){spawn(W*(.15+Math.random()*.7),H*(.15+Math.random()*.35),70,0,6.28,sp*.6,.12)},600+f*700));
-  (function tick(){cctx.clearRect(0,0,W,H);
-    parts.forEach(function(p){p.vy+=p.g;p.vx*=.992;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
-      cctx.save();cctx.translate(p.x,p.y);cctx.rotate(p.r);cctx.fillStyle=p.c;cctx.beginPath();cctx.moveTo(0,-p.s);cctx.lineTo(p.s*.8,p.s*.6);cctx.lineTo(-p.s*.8,p.s*.6);cctx.closePath();cctx.fill();cctx.restore()});
-    parts=parts.filter(function(p){return p.y<H+60});
-    if(cel.classList.contains('on'))raf=requestAnimationFrame(tick)})()}
-document.getElementById('celx').addEventListener('click',closeCel);
-cel.addEventListener('click',function(e){if(e.target===cel)closeCel()});
-addEventListener('keydown',function(e){if(e.key==='Escape')closeCel()});
-document.getElementById('lvtest').addEventListener('click',function(){var n=lv.n||0,t=MS.filter(function(m){return m<=n}).pop();celebrate(t||MS[0])});
 window.VOULGE_READY=true;
 })();
