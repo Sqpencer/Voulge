@@ -77,25 +77,6 @@ h2{font:700 clamp(34px,5vw,56px)/1.1 var(--b);letter-spacing:-.01em;margin-botto
 .go a:hover{box-shadow:inset 0 0 0 1px var(--br2);background:var(--bg3);transform:translateY(-4px)}
 .go h3{font:700 20px var(--b);margin-bottom:6px}.go p{font-size:14px;color:var(--mute)}
 .go small{display:block;font:500 10.5px var(--b);letter-spacing:.24em;text-transform:uppercase;color:var(--br);margin-bottom:10px}
-/* videos */
-.chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:34px}
-.chip{font:500 11px var(--b);letter-spacing:.22em;text-transform:uppercase;padding:11px 22px;background:var(--bg3);color:var(--mute);border:0;cursor:pointer;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);transition:.3s}
-.chip:hover{color:var(--ink)}.chip.on{background:var(--br);color:#16110b}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.card{display:block;background:var(--bg2);box-shadow:inset 0 0 0 1px var(--line);clip-path:polygon(0 0,calc(100% - 26px) 0,100% 26px,100% 100%,0 100%);transition:transform .2s ease-out,box-shadow .4s;transform-style:preserve-3d;position:relative;overflow:hidden}
-.card::before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(240px circle at var(--mx,50%) var(--my,0),rgba(209,160,106,.18),transparent 60%);opacity:0;transition:opacity .4s}
-.card:hover{box-shadow:inset 0 0 0 1px var(--br2)}.card:hover::before{opacity:1}
-.th{aspect-ratio:16/9;background:repeating-linear-gradient(135deg,#17191c 0 14px,#121417 14px 28px);display:grid;place-items:center;position:relative;overflow:hidden}
-.th::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.12),transparent);transform:skewX(-20deg);transition:left .9s var(--e)}
-.card:hover .th::after{left:130%}
-.pl2{width:58px;height:58px;background:rgba(6,6,7,.85);box-shadow:inset 0 0 0 1px var(--sv);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);display:grid;place-items:center;transition:.5s var(--e)}
-.pl2::after{content:"";border-left:14px solid #fff;border-block:9px solid transparent;margin-left:4px;transition:.5s var(--e)}
-.card:hover .pl2{background:var(--br);transform:rotate(90deg) scale(1.15)}.card:hover .pl2::after{transform:rotate(-90deg);border-left-color:#16110b}
-.rk{position:absolute;top:10px;left:10px;z-index:3;font:400 15px var(--h);letter-spacing:.1em;background:var(--br);color:#16110b;padding:2px 12px 2px 9px;clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%)}
-.du{position:absolute;right:10px;bottom:10px;font:500 10.5px var(--b);background:rgba(6,6,7,.88);padding:3px 9px}
-.cb{padding:16px 22px 22px}.cb h3{font:500 18px/1.3 var(--b);margin-bottom:6px}.cb p{font-size:14px;color:var(--mute)}
-.nt{display:inline-block;font:500 10px var(--b);letter-spacing:.2em;text-transform:uppercase;color:var(--br);margin-bottom:6px}
-.th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .7s var(--e)}.card:hover .th img{transform:scale(1.07)}.pl2,.du{z-index:2}.note{margin-top:22px;color:var(--mute);font-size:14px}
 /* channel page banners + profile pictures */
 .chb{position:relative;height:clamp(150px,26vw,300px);overflow:hidden;background:linear-gradient(135deg,#2a2018,#8a5c32 50%,#1a1c20);clip-path:polygon(0 0,100% 0,100% calc(100% - 28px),calc(100% - 28px) 100%,0 100%)}
 .chb::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.06) 0 2px,transparent 2px 70px)}
