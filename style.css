@@ -85,8 +85,8 @@ h2{font:700 clamp(34px,5vw,56px)/1.1 var(--b);letter-spacing:-.01em;margin-botto
 .chb::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(6,6,7,.7))}
 .pfp.chp{margin:-68px 0 26px 28px;position:relative;z-index:3}
 /* voulg3 */
-.b3w{overflow:hidden;margin-bottom:10px}
-.b3{font:400 clamp(140px,30vw,420px)/.8 var(--h);color:transparent;-webkit-text-stroke:1px #3b4248;white-space:nowrap;will-change:transform}
+.b3w{overflow:hidden;margin:-6px 0 4px}
+.b3{font:400 clamp(70px,13vw,190px)/.85 var(--h);color:transparent;-webkit-text-stroke:2px #8a929a;paint-order:stroke fill;white-space:nowrap;will-change:transform}
 .b3 em{font-style:normal;color:var(--br);-webkit-text-stroke:0}
 .btns{display:flex;gap:14px;flex-wrap:wrap}
 /* community */
