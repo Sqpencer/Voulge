@@ -9,7 +9,8 @@
    channelId : starts with UC...   OR   handle: '@yourhandle'
    maxVideos : how many videos + shorts to load (max 50)
    shortMax  : anything this many seconds or shorter counts as a Short (default 180)
-   liveEvery : seconds between live subscriber checks while the /live page is open (default 30)
+   liveEvery : seconds between live subscriber checks while the /live page is open (default 1, minimum 1)
+   invertLightBanners : true = banners that are mostly white get flipped to dark so they fit the site (set false to turn off)
    celebrateOnLoad : true = a visitor sees the celebration for the latest milestone once */
 window.VOULGE_CONFIG={
   pfp:'https://i.imgur.com/EGyqxIA.png',      // home + about
@@ -20,5 +21,5 @@ window.VOULGE_CONFIG={
   pfpVoulg3:'https://i.imgur.com/Ibm57Y2.jpeg', // Voulg3 page pfp
   bannerVoulge:'https://i.imgur.com/n2FUeC0.png', // Voulge page banner
   bannerVoulg3:'https://i.imgur.com/1izYxwh.png', // Voulg3 page banner
-  apiKey:'AIzaSyAWB2EWdQg147KeW37M-HAiPEa4XZ2tMgY',channelId:'UClC8ramdKXZXUwQqTjuDRzw',handle:'@Voulge',maxVideos:12,shortMax:180,liveEvery:30,celebrateOnLoad:true
+  apiKey:'AIzaSyAWB2EWdQg147KeW37M-HAiPEa4XZ2tMgY',channelId:'UClC8ramdKXZXUwQqTjuDRzw',handle:'@Voulge',maxVideos:12,shortMax:180,liveEvery:1,celebrateOnLoad:true,invertLightBanners:true
 };
