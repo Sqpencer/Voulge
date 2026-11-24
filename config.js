@@ -20,5 +20,5 @@ window.VOULGE_CONFIG={
   pfpVoulg3:'https://i.imgur.com/Ibm57Y2.jpeg', // Voulg3 page pfp
   bannerVoulge:'https://i.imgur.com/n2FUeC0.png', // Voulge page banner
   bannerVoulg3:'https://i.imgur.com/1izYxwh.png', // Voulg3 page banner
-  apiKey:'',channelId:'UClC8ramdKXZXUwQqTjuDRzw',handle:'@Voulge',maxVideos:12,shortMax:180,liveEvery:30,celebrateOnLoad:true
+  apiKey:'AIzaSyAWB2EWdQg147KeW37M-HAiPEa4XZ2tMgY',channelId:'UClC8ramdKXZXUwQqTjuDRzw',handle:'@Voulge',maxVideos:12,shortMax:180,liveEvery:30,celebrateOnLoad:true
 };
