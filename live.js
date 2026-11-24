@@ -84,6 +84,22 @@ if(!CFG.apiKey||!(CFG.channelId||CFG.handle)){
     }).then(function(){setTimeout(tick,slow?60000:every)})}
   fetchCount().catch(function(e){upEl.textContent='Could not load the count ('+e.message+').'}).then(function(){setTimeout(tick,every)})}
 
+/* ===== fullscreen ===== */
+var fsb=document.getElementById('lvfs'),de=document.documentElement,pseudo=false;
+function inFs(){return !!(document.fullscreenElement||document.webkitFullscreenElement)||pseudo}
+function fsSync(){de.classList.toggle('fs',inFs());fsb.setAttribute('aria-label',inFs()?'Exit fullscreen':'Fullscreen');fsb.title=inFs()?'Exit fullscreen':'Fullscreen'}
+fsb.addEventListener('click',function(){
+  if(inFs()){
+    if(pseudo)pseudo=false;
+    else{var x=document.exitFullscreen||document.webkitExitFullscreen;if(x)x.call(document)}
+  }else{
+    var r=de.requestFullscreen||de.webkitRequestFullscreen;
+    if(r){try{var p=r.call(de);if(p&&p.catch)p.catch(function(){pseudo=true;fsSync()})}catch(e){pseudo=true}}
+    else pseudo=true}
+  fsSync()});
+document.addEventListener('fullscreenchange',fsSync);document.addEventListener('webkitfullscreenchange',fsSync);
+addEventListener('keydown',function(e){if(e.key==='Escape'&&pseudo){pseudo=false;fsSync()}});
+
 /* ===== celebration ===== */
 var cel=document.getElementById('cel'),cc=document.getElementById('celc'),cctx=cc.getContext('2d'),parts=[],raf=0,closeT=0,tms=[];
 var COL=['#d1a06a','#f4f5f6','#c9ced4','#8a5c32','#ffd9a0','#ffffff'];
