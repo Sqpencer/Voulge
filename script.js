@@ -3,7 +3,7 @@
    banner    : banner link from Imgur. Leave '' to show a placeholder gradient.
                Use the direct image link, e.g. https://i.imgur.com/AbC123.png
                (a plain https://imgur.com/AbC123 link also works; album links do not)
-   pfpVoulge, pfpVoulg3, bannerVoulge, bannerVoulg3 : optional. Give each channel page its own
+   pfpVideos, bannerVideos, pfpVoulge, pfpVoulg3, bannerVoulge, bannerVoulg3 : optional. Give each channel page its own
                profile picture / banner. Left out, they reuse pfp and banner above.
    apiKey    : YouTube Data API v3 key (Google Cloud Console). Restrict it to your site's domain.
    channelId : starts with UC...   OR   handle: '@yourhandle'
@@ -12,6 +12,8 @@
 window.VOULGE_CONFIG={
   pfp:'https://i.imgur.com/EGyqxIA.png',      // home + about
   banner:'https://i.imgur.com/6BrcY8p.png',   // home hero
+  pfpVideos:'',                               // Videos page pfp (empty = reuses pfp above)
+  bannerVideos:'',                            // Videos page banner (empty = reuses banner above)
   pfpVoulge:'',                               // Voulge page pfp (empty = reuses pfp above)
   pfpVoulg3:'https://i.imgur.com/Ibm57Y2.jpeg', // Voulg3 page pfp
   bannerVoulge:'https://i.imgur.com/n2FUeC0.png', // Voulge page banner
