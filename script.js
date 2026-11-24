@@ -8,7 +8,15 @@
    apiKey    : YouTube Data API v3 key (Google Cloud Console). Restrict it to your site's domain.
    channelId : starts with UC...   OR   handle: '@yourhandle'
    maxVideos : how many videos to show */
-window.VOULGE_CONFIG={pfp:'https://i.imgur.com/EGyqxIA.png',banner:'https://i.imgur.com/6BrcY8p.png',apiKey:'',channelId:'',handle:'',maxVideos:6};
+window.VOULGE_CONFIG={
+  pfp:'https://i.imgur.com/EGyqxIA.png',      // home + about
+  banner:'https://i.imgur.com/6BrcY8p.png',   // home hero
+  pfpVoulge:'',                               // Voulge page pfp (empty = reuses pfp above)
+  pfpVoulg3:'',                               // Voulg3 page pfp (empty = reuses pfp above)
+  bannerVoulge:'',                            // Voulge page banner (empty = reuses banner above)
+  bannerVoulg3:'',                            // Voulg3 page banner (empty = reuses banner above)
+  apiKey:'',channelId:'',handle:'',maxVideos:6
+};
 
 (function(){
 var $=function(s,c){return [].slice.call((c||document).querySelectorAll(s))};
