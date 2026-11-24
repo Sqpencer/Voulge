@@ -1,11 +1,13 @@
-/* ===== SETUP: fill these in =====
+/* ===== SETUP: fill these in (YouTube API lives here) =====
    pfp       : profile picture link from Imgur. Leave '' to show a placeholder "V".
    banner    : banner link from Imgur. Leave '' to show a placeholder gradient.
                Use the direct image link, e.g. https://i.imgur.com/AbC123.png
                (a plain https://imgur.com/AbC123 link also works; album links do not)
    pfpVoulge, pfpVoulg3, bannerVoulge, bannerVoulg3 : optional. Give each channel page its own
                profile picture / banner. Left out, they reuse pfp and banner above.
-   */
+   apiKey    : YouTube Data API v3 key (Google Cloud Console). Restrict it to your site's domain.
+   channelId : starts with UC...   OR   handle: '@yourhandle'
+   maxVideos : how many videos to show */
 window.VOULGE_CONFIG={
   pfp:'https://i.imgur.com/EGyqxIA.png',      // home + about
   banner:'https://i.imgur.com/6BrcY8p.png',   // home hero
@@ -13,6 +15,7 @@ window.VOULGE_CONFIG={
   pfpVoulg3:'https://i.imgur.com/Ibm57Y2.jpeg', // Voulg3 page pfp
   bannerVoulge:'https://i.imgur.com/n2FUeC0.png', // Voulge page banner
   bannerVoulg3:'https://i.imgur.com/1izYxwh.png', // Voulg3 page banner
+  apiKey:'',channelId:'',handle:'',maxVideos:6
 };
 
 (function(){
@@ -72,7 +75,7 @@ var cio=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isInt
   $('[data-count]',e.target).forEach(function(b){var to=+b.dataset.count,t0=performance.now();(function s(n){var p=Math.min(1,(n-t0)/1200);b.textContent=Math.round(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(s)})(t0)})})},{threshold:.5});
 cio.observe(document.getElementById('stats'));
 /* scrolling sections: the menu scrolls to each one */
-var names=['home','about','voulge','voulg3','community'],links=$('#nv a'),nv=document.getElementById('nv'),pgs=names.map(function(n){return document.getElementById(n)});
+var names=['home','about','videos','voulge','voulg3','community'],links=$('#nv a'),nv=document.getElementById('nv'),pgs=names.map(function(n){return document.getElementById(n)});
 links.forEach(function(a){a.addEventListener('click',function(){nv.classList.remove('open')})});
 draw();
 document.getElementById('mn').addEventListener('click',function(){nv.classList.toggle('open')});
@@ -113,5 +116,25 @@ document.addEventListener('click',function(e){
 $('.mag').forEach(function(b){
   b.addEventListener('mousemove',function(e){var r=b.getBoundingClientRect();b.style.transform='translate('+((e.clientX-r.left-r.width/2)*.25).toFixed(1)+'px,'+((e.clientY-r.top-r.height/2)*.35).toFixed(1)+'px)'});
   b.addEventListener('mouseleave',function(){b.style.transform=''})});
+/* YouTube featured videos */
+var grid=document.getElementById('vg'),note=document.getElementById('vn'),vids=[];
+var PH=['one','two','three','four','five','six'].map(function(n){return{title:'Video title '+n,desc:'Add your API key and channel ID to load your latest videos.',meta:'Orion Drift',url:'#',views:0,t:0}});
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function kf(n){n=+n;return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':String(n)}
+function dur(s){var m=/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/.exec(s)||[],h=+m[1]||0,mi=+m[2]||0,se=+m[3]||0;return(h?h+':'+('0'+mi).slice(-2):mi)+':'+('0'+se).slice(-2)}
+function tilt(c){c.addEventListener('mousemove',function(e){var r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;c.style.setProperty('--mx',x*100+'%');c.style.setProperty('--my',y*100+'%');c.style.transform='perspective(800px) rotateY('+((x-.5)*10).toFixed(2)+'deg) rotateX('+((.5-y)*10).toFixed(2)+'deg) translateY(-6px)'});c.addEventListener('mouseleave',function(){c.style.transform=''})}
+function render(list){
+  grid.innerHTML=list.map(function(v,i){return '<div class="cw rv" style="--d:'+(i%3)+'"><a class="card tilt" href="'+esc(v.url)+'" target="_blank" rel="noopener"><span class="rk">0'+(i+1)+'</span><div class="th">'+(v.img?'<img src="'+esc(v.img)+'" alt="" loading="lazy">':'')+'<span class="pl2"></span>'+(v.dur?'<span class="du">'+v.dur+'</span>':'')+'</div><div class="cb"><span class="nt">'+esc(v.meta)+'</span><h3>'+esc(v.title)+'</h3><p>'+esc(v.desc)+'</p></div></a></div>'}).join('');
+  $('.rv',grid).forEach(function(el){el.classList.add('dn');io.observe(el)});$('.tilt',grid).forEach(tilt)}
+function api(path,q){q.key=CFG.apiKey;return fetch('https://www.googleapis.com/youtube/v3/'+path+'?'+new URLSearchParams(q)).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error&&j.error.message||r.status);return j})})}
+function uploads(){if(CFG.channelId)return Promise.resolve(CFG.channelId.replace(/^UC/,'UU'));return api('channels',{part:'contentDetails',forHandle:CFG.handle}).then(function(j){if(!j.items||!j.items.length)throw new Error('channel not found');return j.items[0].contentDetails.relatedPlaylists.uploads})}
+function load(){
+  if(!CFG.apiKey||!(CFG.channelId||CFG.handle)){vids=PH;render(vids);note.textContent='Preview mode: add your YouTube API key and channel ID in VOULGE_CONFIG (top of the script) to load real videos.';return}
+  uploads().then(function(pid){return api('playlistItems',{part:'snippet',playlistId:pid,maxResults:CFG.maxVideos||6})})
+  .then(function(j){return api('videos',{part:'snippet,contentDetails,statistics',id:j.items.map(function(i){return i.snippet.resourceId.videoId}).join(',')})})
+  .then(function(j){vids=j.items.map(function(v){var t=v.snippet.thumbnails,b=t.maxres||t.high||t.medium||t.default,d=new Date(v.snippet.publishedAt);return{title:v.snippet.title,desc:(v.snippet.description||v.snippet.channelTitle).replace(/\s+/g,' ').slice(0,90),meta:kf(v.statistics.viewCount||0)+' views · '+d.toLocaleDateString(undefined,{month:'short',year:'numeric'}),url:'https://www.youtube.com/watch?v='+v.id,img:b.url,dur:dur(v.contentDetails.duration),views:+v.statistics.viewCount||0,t:+d}});note.textContent='';render(vids)})
+  .catch(function(e){vids=PH;render(vids);note.textContent='Could not load videos from YouTube ('+e.message+'). Showing placeholders.'})}
+$('.chip').forEach(function(ch){ch.addEventListener('click',function(){$('.chip').forEach(function(c){c.classList.toggle('on',c===ch)});var pop=ch.dataset.s==='popular';render(vids.slice().sort(function(a,b){return pop?b.views-a.views:b.t-a.t}))})});
+load();
 window.VOULGE_READY=true;
 })();
