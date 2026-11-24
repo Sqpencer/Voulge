@@ -18,7 +18,7 @@ window.VOULGE_CONFIG={
   pfpVoulg3:'https://i.imgur.com/Ibm57Y2.jpeg', // Voulg3 page pfp
   bannerVoulge:'https://i.imgur.com/n2FUeC0.png', // Voulge page banner
   bannerVoulg3:'https://i.imgur.com/1izYxwh.png', // Voulg3 page banner
-  apiKey:'',channelId:'',handle:'@Voulge',maxVideos:12,shortMax:180
+  apiKey:'AIzaSyAWB2EWdQg147KeW37M-HAiPEa4XZ2tMgY',channelId:'UClC8ramdKXZXUwQqTjuDRzw',handle:'@Voulge',maxVideos:12,shortMax:180
 };
 
 (function(){
@@ -132,7 +132,7 @@ function render(){
   if(vids!==PH){note.textContent=list.length?'':'Nothing here yet.'}
   grid.innerHTML=list.map(function(v,i){return '<div class="cw rv" style="--d:'+(i%3)+'"><a class="card tilt'+(v.short?' sh':'')+'" href="'+esc(v.url)+'" target="_blank" rel="noopener"><span class="rk">0'+(i+1)+'</span><div class="th">'+(v.img?'<img src="'+esc(v.img)+'" alt="" loading="lazy">':'')+'<span class="tp '+(v.short?'s">Short':'v">Video')+'</span><span class="pl2"></span>'+(v.dur?'<span class="du">'+v.dur+'</span>':'')+'</div><div class="cb"><span class="nt">'+esc(v.meta)+'</span><h3>'+esc(v.title)+'</h3><p>'+esc(v.desc)+'</p></div></a></div>'}).join('');
   $('.rv',grid).forEach(function(el){el.classList.add('dn');io.observe(el)});$('.tilt',grid).forEach(tilt)}
-function api(path,q){q.key=CFG.apiKey;return fetch('AIzaSyAWB2EWdQg147KeW37M-HAiPEa4XZ2tMgY'+path+'?'+new URLSearchParams(q)).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error&&j.error.message||r.status);return j})})}
+function api(path,q){q.key=CFG.apiKey;return fetch('https://www.googleapis.com/youtube/v3/'+path+'?'+new URLSearchParams(q)).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error&&j.error.message||r.status);return j})})}
 function uploads(){if(CFG.channelId)return Promise.resolve(CFG.channelId.replace(/^UC/,'UU'));return api('channels',{part:'contentDetails',forHandle:CFG.handle}).then(function(j){if(!j.items||!j.items.length)throw new Error('channel not found');return j.items[0].contentDetails.relatedPlaylists.uploads})}
 function load(){
   if(!CFG.apiKey||!(CFG.channelId||CFG.handle)){vids=PH;render();note.textContent='Preview mode: add your YouTube API key and channel ID in VOULGE_CONFIG (top of the script) to load real videos.';return}
