@@ -29,7 +29,7 @@ $('.mag').forEach(function(b){
   b.addEventListener('mouseleave',function(){b.style.transform=''})});
 
 /* ===== YouTube ===== */
-function api(path,q){q.key=CFG.apiKey;return fetch('https://www.googleapis.com/youtube/v3/'+path+'?'+new URLSearchParams(q)).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error&&j.error.message||r.status);return j})})}
+function api(path,q){q.key=CFG.apiKey;return fetch('https://www.googleapis.com/youtube/v3/'+path+'?'+new URLSearchParams(q),{cache:'no-store'}).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error&&j.error.message||r.status);return j})})}
 function kf(n){n=+n;return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':String(n)}
 
 /* ===== Live subscriber count + milestone celebrations ===== */
@@ -67,7 +67,7 @@ function liveCount(n){
   if(hit.length){var t=hit[hit.length-1];seenSet(Math.max(seenGet(),t));celebrate(t)}}
 function liveHidden(){document.getElementById('lvup').textContent='Subscriber count is hidden on YouTube.'}
 function fetchCount(){
-  return api('channels',Object.assign({part:'statistics'},CFG.channelId?{id:CFG.channelId}:{forHandle:CFG.handle})).then(function(j){
+  return api('channels',Object.assign({part:'statistics',fields:'items/statistics(subscriberCount,hiddenSubscriberCount)'},CFG.channelId?{id:CFG.channelId}:{forHandle:CFG.handle})).then(function(j){
     var s=j.items&&j.items[0]&&j.items[0].statistics;
     if(!s)throw new Error('channel not found');
     if(s.hiddenSubscriberCount)liveHidden();else liveCount(+s.subscriberCount)})}
@@ -75,9 +75,14 @@ var upEl=document.getElementById('lvup');
 if(!CFG.apiKey||!(CFG.channelId||CFG.handle)){
   upEl.textContent='Add your YouTube API key in config.js to start the live count.'
 }else{
-  fetchCount().catch(function(e){upEl.textContent='Could not load the count ('+e.message+').'});
-  /* only poll while this tab is visible (saves API quota) */
-  setInterval(function(){if(document.hidden||lv.n===null)return;fetchCount().catch(function(){})},Math.max(5,CFG.liveEvery||30)*1000)}
+  var every=Math.max(1,CFG.liveEvery||1)*1000,slow=false;
+  /* one request at a time, then wait; no pile-up if YouTube is slow. Paused while the tab is hidden. */
+  function tick(){
+    if(document.hidden||lv.n===null){setTimeout(tick,every);return}
+    fetchCount().then(function(){if(slow){slow=false}}).catch(function(e){
+      if(/quota/i.test(e.message)){slow=true;upEl.textContent='YouTube daily limit reached, slowing down.'}
+    }).then(function(){setTimeout(tick,slow?60000:every)})}
+  fetchCount().catch(function(e){upEl.textContent='Could not load the count ('+e.message+').'}).then(function(){setTimeout(tick,every)})}
 
 /* ===== celebration ===== */
 var cel=document.getElementById('cel'),cc=document.getElementById('celc'),cctx=cc.getContext('2d'),parts=[],raf=0,closeT=0,tms=[];
