@@ -16,7 +16,7 @@
 <div id="glow"></div><div id="prog"></div>
 <header id="hd">
   <a class="logo" href="#home"><svg viewBox="0 0 14 28"><path d="M7 0 14 12 9 28H5L0 12Z" fill="#f4f5f6"/></svg>VOULGE</a>
-  <nav id="nv"><a href="#home">Home</a><a href="#about">About</a><a href="#voulge">Voulge</a><a href="#voulg3">Voulg3</a><a href="#community">Community</a></nav>
+  <nav id="nv"><a href="#home">Home</a><a href="#about">About</a><a href="#videos">Videos</a><a href="#voulge">Voulge</a><a href="#voulg3">Voulg3</a><a href="#community">Community</a></nav>
   <button class="mb" id="mn" aria-label="Menu"><i></i><i></i><i></i></button>
 </header>
 
@@ -35,7 +35,7 @@
     <div class="tag"><i></i>Orion Drift creator</div>
     <h1 aria-label="Voulge"><span>V</span><span>O</span><span>U</span><span>L</span><span>G</span><span>E</span></h1>
     <p class="hs">I make Orion Drift videos and content in VR.</p>
-    <div class="cta"><a class="btn mag" href="#voulge">My channels</a><a class="btn g mag" href="#about">About me</a></div>
+    <div class="cta"><a class="btn mag" href="#videos">Watch my videos</a><a class="btn g mag" href="#about">About me</a></div>
   </div>
   <div class="cue"></div>
 </section>
@@ -53,9 +53,10 @@
   <h2 class="rv" style="--d:1">Around the site</h2>
   <div class="go">
     <a class="rv" style="--d:0" href="#about"><small>01</small><h3>About</h3><p>Who I am and what I make.</p></a>
-    <a class="rv" style="--d:2" href="#voulge"><small>02</small><h3>Voulge</h3><p>My main channel.</p></a>
-    <a class="rv" style="--d:0" href="#voulg3"><small>03</small><h3>Voulg3</h3><p>My second channel.</p></a>
-    <a class="rv" style="--d:1" href="#community"><small>04</small><h3>Community</h3><p>Join the Discord and hang out.</p></a>
+    <a class="rv" style="--d:1" href="#videos"><small>02</small><h3>Videos</h3><p>My latest Orion Drift videos.</p></a>
+    <a class="rv" style="--d:2" href="#voulge"><small>03</small><h3>Voulge</h3><p>My main channel.</p></a>
+    <a class="rv" style="--d:0" href="#voulg3"><small>04</small><h3>Voulg3</h3><p>My second channel.</p></a>
+    <a class="rv" style="--d:1" href="#community"><small>05</small><h3>Community</h3><p>Join the Discord and hang out.</p></a>
   </div>
 </div></section>
 </div>
@@ -67,11 +68,23 @@
   <div class="eb rv">About</div>
   <h2 class="rv" style="--d:1">About me</h2>
   <p class="lead rv" style="--d:2">I’m Voulge, a content creator making Orion Drift videos in VR.</p>
-  <div class="btns rv" style="--d:3"><a class="btn mag" href="#voulge">My channels</a><a class="btn g mag" href="#community">Join the community</a></div>
+  <div class="btns rv" style="--d:3"><a class="btn mag" href="#videos">Watch the videos</a><a class="btn g mag" href="#community">Join the community</a></div>
 </div></section>
 </div>
 
-<!-- 3. VOULGE (main channel) -->
+<!-- 3. VIDEOS (YouTube API) -->
+<div class="page" id="videos">
+<section class="s"><div class="wrap">
+  <div class="eb rv">Videos</div>
+  <h2 class="rv" style="--d:1">Featured videos</h2>
+  <p class="lead rv" style="--d:2">My latest Orion Drift videos, pulled straight from YouTube.</p>
+  <div class="chips rv" style="--d:3"><button class="chip on" data-s="latest">Latest</button><button class="chip" data-s="popular">Most viewed</button></div>
+  <div class="grid" id="vg"></div>
+  <p class="note" id="vn"></p>
+</div></section>
+</div>
+
+<!-- 4. VOULGE (main channel) -->
 <div class="page" id="voulge">
 <section class="s"><div class="wrap">
   <div class="chb rv" data-k="bannerVoulge"><img alt="Voulge channel banner"></div>
@@ -79,11 +92,11 @@
   <div class="eb rv">Main channel</div>
   <h2 class="rv" style="--d:1">Voulge</h2>
   <p class="lead rv" style="--d:2">Voulge is my main channel, where I post my Orion Drift videos in VR.</p>
-  <div class="btns rv" style="--d:3"><a class="btn mag" href="#" target="_blank" rel="noopener">Visit the channel</a><a class="btn g mag" href="#voulg3">See Voulg3</a></div>
+  <div class="btns rv" style="--d:3"><a class="btn mag" href="#" target="_blank" rel="noopener">Visit the channel</a><a class="btn g mag" href="#videos">See my videos</a></div>
 </div></section>
 </div>
 
-<!-- 4. VOULG3 (second channel) -->
+<!-- 5. VOULG3 (second channel) -->
 <div class="page" id="voulg3">
 <section class="s"><div class="wrap">
   <div class="chb rv" data-k="bannerVoulg3"><img alt="Voulg3 channel banner"></div>
@@ -96,7 +109,7 @@
 </div></section>
 </div>
 
-<!-- 5. COMMUNITY -->
+<!-- 6. COMMUNITY -->
 <div class="page" id="community">
 <section class="s"><div class="wrap">
   <div class="eb rv">Community</div>
