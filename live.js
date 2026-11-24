@@ -33,7 +33,7 @@ function api(path,q){q.key=CFG.apiKey;return fetch('https://www.googleapis.com/y
 function kf(n){n=+n;return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':String(n)}
 
 /* ===== Live subscriber count + milestone celebrations ===== */
-var MS=[23,50,100,250,500,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,20000,30000,40000,50000,60000,70000,80000,90000,100000,500000,1000000,2000000,3000000,4000000,5000000,6000000,7000000,8000000,9000000,10000000,50000000,100000000];
+var MS=[25,50,100,250,500,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000,20000,30000,40000,50000,60000,70000,80000,90000,100000,500000,1000000,2000000,3000000,4000000,5000000,6000000,7000000,8000000,9000000,10000000,50000000,100000000];
 function msl(n){return n>=1e6?n/1e6+'M':n>=1e3?n/1e3+'K':String(n)}
 function com(n){return Number(n).toLocaleString('en-US')}
 var lv={n:null,start:0,digits:0,odo:document.getElementById('odo')},msEl=document.getElementById('ms');
